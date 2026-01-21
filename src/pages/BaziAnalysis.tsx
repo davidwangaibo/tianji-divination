@@ -83,8 +83,10 @@ const BaziAnalysis = () => {
         const hourBranch = EARTHLY_BRANCHES[Math.floor((hour + 1) / 2) % 12];
         const hourStem = HEAVENLY_STEMS[(day % 5 * 2 + Math.floor((hour + 1) / 2)) % 10];
 
+
         const dayMasterInfo = STEM_ELEMENTS[dayStem];
         const dayMasterElement = dayMasterInfo.element;
+
 
         // 计算五行强弱
         const allStems = [yearStem, monthStem, dayStem, hourStem];
@@ -95,6 +97,7 @@ const BaziAnalysis = () => {
         });
         const strongElement = Object.entries(elementCounts).sort((a, b) => b[1] - a[1])[0][0];
         const weakElement = Object.entries(elementCounts).sort((a, b) => a[1] - b[1])[0][0];
+
 
         setResult({
             year: `${yearStem}${yearBranch}`,
@@ -119,7 +122,8 @@ const BaziAnalysis = () => {
         });
     };
 
-    const getLuckyElements = (dayElement: string, counts: { [key: string]: number }) => {
+
+    const getLuckyElements = (dayElement: string => {
         const elements = ['木', '火', '土', '金', '水'];
         const dayIndex = elements.indexOf(dayElement);
         // 喜用神简化计算
@@ -127,6 +131,7 @@ const BaziAnalysis = () => {
         const producedElement = elements[(dayIndex + 1) % 5]; // 我生者
         return { lucky: producingElement, helpful: producedElement };
     };
+
 
     return (
         <main className="relative z-10 px-4 py-8 max-w-4xl mx-auto">
@@ -137,9 +142,11 @@ const BaziAnalysis = () => {
                 返回首页
             </Link>
 
+
             <div className="glass-card p-8">
                 <h2 className="golden-title text-4xl text-center mb-6">八字详批</h2>
                 <p className="text-center text-[var(--color-text-muted)] mb-8">输入您的出生信息，解析您的四柱八字命理。</p>
+
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div>
@@ -160,90 +167,3 @@ const BaziAnalysis = () => {
                             <option value="female">女</option>
                         </select>
                     </div>
-                </div>
-
-                <div className="flex justify-center">
-                    <button onClick={calculateBazi} disabled={!birthDate}
-                        className="px-8 py-3 rounded-lg font-semibold transition-all disabled:opacity-50"
-                        style={{ background: 'linear-gradient(135deg, #d4a853, #c49843)', color: '#0a1628' }}>
-                        排盘分析
-                    </button>
-                </div>
-
-                {result && (
-                    <div className="mt-8 space-y-6">
-                        {/* 四柱展示 */}
-                        <div className="grid grid-cols-4 gap-4">
-                            {[
-                                { label: '年柱', value: result.year },
-                                { label: '月柱', value: result.month },
-                                { label: '日柱', value: result.day },
-                                { label: '时柱', value: result.hour },
-                            ].map((pillar) => (
-                                <div key={pillar.label} className="text-center p-4 rounded-lg" style={{ background: 'rgba(212, 168, 83, 0.1)', border: '1px solid var(--color-card-border)' }}>
-                                    <p className="text-[var(--color-text-muted)] text-sm mb-2">{pillar.label}</p>
-                                    <p className="text-2xl text-[var(--color-primary)]">{pillar.value}</p>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* 基本信息 */}
-                        <div className="flex justify-center flex-wrap gap-3">
-                            <span className="px-4 py-2 rounded-full text-sm" style={{ background: 'rgba(212, 168, 83, 0.2)', color: 'var(--color-primary)' }}>
-                                生肖: {result.zodiac}
-                            </span>
-                            <span className="px-4 py-2 rounded-full text-sm" style={{ background: 'rgba(100, 130, 180, 0.2)', color: 'var(--color-text-light)' }}>
-                                日主: {result.dayMaster} ({result.dayMasterElement})
-                            </span>
-                            <span className="px-4 py-2 rounded-full text-sm" style={{ background: 'rgba(100, 180, 100, 0.2)', color: '#22c55e' }}>
-                                喜用: {result.luckyElements.lucky}
-                            </span>
-                        </div>
-
-                        {/* 五行分析 */}
-                        <div className="p-4 rounded-lg" style={{ background: 'rgba(100, 130, 180, 0.1)' }}>
-                            <h4 className="text-[var(--color-primary)] font-semibold mb-3">五行分布</h4>
-                            <div className="flex justify-around">
-                                {FIVE_ELEMENTS.map(el => (
-                                    <div key={el} className="text-center">
-                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-1 ${result.elementCounts[el] >= 2 ? 'bg-yellow-500/30' : result.elementCounts[el] === 0 ? 'bg-red-500/30' : 'bg-blue-500/20'}`}>
-                                            <span className="text-xl">{el}</span>
-                                        </div>
-                                        <p className="text-xs text-[var(--color-text-muted)]">{result.elementCounts[el]}个</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* 详细解读 */}
-                        <div className="p-4 rounded-lg" style={{ background: 'rgba(100, 130, 180, 0.1)' }}>
-                            <h4 className="text-[var(--color-primary)] font-semibold mb-2">💫 性格分析</h4>
-                            <p className="text-[var(--color-text-light)]">{result.analysis.personality}</p>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="p-4 rounded-lg" style={{ background: 'rgba(100, 130, 180, 0.1)' }}>
-                                <h4 className="text-[var(--color-primary)] font-semibold mb-2">💼 事业运势</h4>
-                                <p className="text-[var(--color-text-light)] text-sm">{result.analysis.career}</p>
-                            </div>
-                            <div className="p-4 rounded-lg" style={{ background: 'rgba(100, 130, 180, 0.1)' }}>
-                                <h4 className="text-[var(--color-primary)] font-semibold mb-2">💰 财运预测</h4>
-                                <p className="text-[var(--color-text-light)] text-sm">{result.analysis.wealth}</p>
-                            </div>
-                            <div className="p-4 rounded-lg" style={{ background: 'rgba(100, 130, 180, 0.1)' }}>
-                                <h4 className="text-[var(--color-primary)] font-semibold mb-2">❤️ 感情运势</h4>
-                                <p className="text-[var(--color-text-light)] text-sm">{result.analysis.love}</p>
-                            </div>
-                            <div className="p-4 rounded-lg" style={{ background: 'rgba(100, 130, 180, 0.1)' }}>
-                                <h4 className="text-[var(--color-primary)] font-semibold mb-2">🏥 健康提示</h4>
-                                <p className="text-[var(--color-text-light)] text-sm">{result.analysis.health}</p>
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-        </main>
-    );
-};
-
-export default BaziAnalysis;
