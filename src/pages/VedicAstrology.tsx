@@ -1,47 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-
-const NAKSHATRAS = [
-    { name: '阿须毗尼 (Ashwini)', deity: '双马神', nature: '快速行动', traits: '活力充沛，行动迅速，喜欢冒险' },
-    { name: '婆罗尼 (Bharani)', deity: '阎摩', nature: '承载转化', traits: '坚韧不拔，善于承担责任' },
-    { name: '羯利帝迦 (Krittika)', deity: '火神阿耆尼', nature: '切割净化', traits: '目标明确，有批判精神' },
-    { name: '卢希尼 (Rohini)', deity: '造物主', nature: '成长繁荣', traits: '感性浪漫，追求美好事物' },
-    { name: '摩利伽尸罗 (Mrigashira)', deity: '月神', nature: '探索寻找', traits: '好奇心强，善于研究' },
-    { name: '阿陀罗 (Ardra)', deity: '风暴神', nature: '暴风转变', traits: '情感强烈，经历起伏' },
-    { name: '补纳婆苏 (Punarvasu)', deity: '因陀罗母', nature: '回归更新', traits: '乐观向上，能够复原' },
-    { name: '补史耶 (Pushya)', deity: '祭主', nature: '滋养供养', traits: '慷慨大方，善于照顾他人' },
-    { name: '阿舍利沙 (Ashlesha)', deity: '蛇神', nature: '缠绕深入', traits: '直觉敏锐，有神秘感' },
-    { name: '摩伽 (Magha)', deity: '祖先神', nature: '王权尊贵', traits: '领导才能，重视传统' },
-    { name: '补婆发古尼 (P.Phalguni)', deity: '婚姻神', nature: '享乐放松', traits: '热爱生活，享受愉悦' },
-    { name: '乌陀罗发古尼 (U.Phalguni)', deity: '太阳神', nature: '后续发展', traits: '友善可靠，善于合作' },
-];
-
-const RASHIS = [
-    { name: '白羊座 (Mesha)', ruler: '火星', element: '火', traits: '勇敢果决，领导力强', career: '适合创业、军警、运动员等需要开拓精神的职业' },
-    { name: '金牛座 (Vrishabha)', ruler: '金星', element: '土', traits: '稳重务实，追求安全', career: '适合金融、艺术、农业、建筑等稳定职业' },
-    { name: '双子座 (Mithuna)', ruler: '水星', element: '风', traits: '聪明灵活，善于沟通', career: '适合媒体、教育、销售、写作等需要沟通的职业' },
-    { name: '巨蟹座 (Karka)', ruler: '月亮', element: '水', traits: '感性细腻，重视家庭', career: '适合护理、餐饮、房产、教育等服务型职业' },
-    { name: '狮子座 (Simha)', ruler: '太阳', element: '火', traits: '自信慷慨，有魅力', career: '适合管理、表演、政治、奢侈品等领导型职业' },
-    { name: '处女座 (Kanya)', ruler: '水星', element: '土', traits: '细心严谨，追求完美', career: '适合医疗、分析、工程、研究等精细工作' },
-    { name: '天秤座 (Tula)', ruler: '金星', element: '风', traits: '优雅和谐，善于平衡', career: '适合法律、外交、设计、公关等需要协调的职业' },
-    { name: '天蝎座 (Vrishchika)', ruler: '火星', element: '水', traits: '深邃神秘，意志坚强', career: '适合侦查、心理、研究、金融等需要洞察力的职业' },
-    { name: '射手座 (Dhanu)', ruler: '木星', element: '火', traits: '乐观开朗，追求自由', career: '适合教育、旅游、法律、出版等拓展视野的职业' },
-    { name: '摩羯座 (Makara)', ruler: '土星', element: '土', traits: '严肃务实，有责任感', career: '适合管理、政府、建筑、科学等需要耐心的职业' },
-    { name: '水瓶座 (Kumbha)', ruler: '土星', element: '风', traits: '独立创新，有人道精神', career: '适合科技、慈善、社群、发明等前瞻性职业' },
-    { name: '双鱼座 (Meena)', ruler: '木星', element: '水', traits: '敏感直觉，富有同情心', career: '适合艺术、灵性、医疗、创意等需要想象力的职业' },
-];
-
-const DASHAS = [
-    { planet: '太阳', duration: 6, traits: '领导力增强，自我意识觉醒，事业成就期', advice: '此期间适合追求领导地位和个人成就，但需注意避免过于自我中心。' },
-    { planet: '月亮', duration: 10, traits: '情感丰富，家庭运势变化，直觉增强期', advice: '关注内心世界和家庭关系，适合发展创意和滋养型事业。' },
-    { planet: '火星', duration: 7, traits: '行动力增强，竞争意识强，开拓进取期', advice: '适合开创新事业，但需控制冲动，避免争斗和意外。' },
-    { planet: '罗睺', duration: 18, traits: '人生转折，物质欲望，外在机遇期', advice: '会有意想不到的机遇，但需谨防欺骗和诱惑，保持清醒头脑。' },
-    { planet: '木星', duration: 16, traits: '智慧增长，贵人相助，精神成长期', advice: '最有利于学习、教育和精神成长，贵人运旺盛。' },
-    { planet: '土星', duration: 19, traits: '责任加重，磨炼成长，业力清算期', advice: '需要脚踏实地付出努力，虽然辛苦但会有长远回报。' },
-    { planet: '水星', duration: 17, traits: '沟通能力强，学习运旺，商业机遇期', advice: '适合学习新技能、发展商业，沟通表达能力增强。' },
-    { planet: '计都', duration: 7, traits: '灵性觉醒，内省反思，放下执念期', advice: '适合灵修和内在成长，需要放下物质执念。' },
-    { planet: '金星', duration: 20, traits: '爱情美满，艺术才能，享乐舒适期', advice: '感情运势好转，适合发展艺术才能，生活品质提升。' },
-];
+import { NAKSHATRAS, RASHIS, DASHAS } from '../data/vedicData';
 
 const VedicAstrology = () => {
     const [birthDate, setBirthDate] = useState('');
@@ -56,10 +15,11 @@ const VedicAstrology = () => {
         const year = date.getFullYear();
         const hour = birthTime ? parseInt(birthTime.split(':')[0]) : 12;
 
-        const nakshatraIndex = (day + month * 2 + hour) % 27;
+        // 修正：使用全部27颗星宿
+        const nakshatraIndex = (day * 3 + month * 2 + hour) % 27;
         const rashiIndex = month % 12;
-        const dashaIndex = (year + month) % 9;
-        const nakshatra = NAKSHATRAS[nakshatraIndex % 12];
+        const dashaIndex = (year + month + day) % 9;
+        const nakshatra = NAKSHATRAS[nakshatraIndex];
         const rashi = RASHIS[rashiIndex];
         const currentDasha = DASHAS[dashaIndex];
 
@@ -87,32 +47,47 @@ const VedicAstrology = () => {
                 'Om Ketave Namaha (敬礼计都神)',
                 'Om Shukraya Namaha (敬礼金星神)',
             ][dashaIndex],
-            yearForecast: generateYearForecast(rashiIndex, dashaIndex),
+            yearForecast: generateYearForecast(rashiIndex, dashaIndex, nakshatraIndex),
+            // 组合分析
+            combinedAnalysis: `您的${nakshatra.name}月亮星宿结合${rashi.name}，展现出${nakshatra.nature}与${rashi.traits}的特质。当前${currentDasha.planet}大运期间，${currentDasha.traits}建议您${nakshatra.career}同时${rashi.career}`,
         });
     };
 
-    const generateYearForecast = (rashiIdx: number, dashaIdx: number) => {
-        const forecasts = {
-            career: [
-                '2026年事业运势上升，有升职加薪的机会。下半年尤其顺利，可能有海外发展机会。',
-                '2026年事业稳定发展，宜巩固现有成果。第二季度有贵人相助，可获得重要项目。',
-                '2026年事业有变动的可能，但变中有机。保持灵活，适应新环境将带来好运。',
-            ],
-            wealth: [
-                '2026年财运亨通，正财偏财俱佳。适合稳健投资，房产相关投资有利可图。',
-                '2026年财运平稳，收入增长稳定。下半年有意外之财，但需控制冲动消费。',
-                '2026年财运起伏，需谨慎理财。避免高风险投资，积累第一优先。',
-            ],
-            love: [
-                '2026年感情运势佳，单身者有望邂逅真爱。有伴者感情升温，可考虑进入新阶段。',
-                '2026年感情稳定，需要用心经营。多创造浪漫时刻，感情会更加甜蜜。',
-                '2026年感情有考验，但也是成长的机会。坦诚沟通，共同面对挑战。',
-            ],
-        };
+    const generateYearForecast = (rashiIdx: number, dashaIdx: number, nakshatraIdx: number) => {
+        const careerForecasts = [
+            '2026年事业运势上升，有升职加薪的机会。上半年需要努力耕耘，下半年收获颇丰，可能有海外发展机会或重要项目负责权。',
+            '2026年事业稳定发展，宜巩固现有成果。第二季度有贵人相助，可获得重要项目。建议提升专业技能，为下一步突破做准备。',
+            '2026年事业有变动的可能，但变中有机。春季是关键转折点，保持灵活，适应新环境将带来意想不到的好运。',
+            '2026年适合创业或开展新项目，创新思维带来机遇。但需注意团队建设，单打独斗容易遇阻，合作共赢是关键。',
+            '2026年事业进入稳定增长期，付出会得到回报。下半年有晋升或转换行业的机会，慎重评估后勇敢尝试。',
+            '2026年工作压力较大但成就感强，适合承担重要责任。第三季度是关键期，坚持原则会赢得尊重和信任。',
+        ];
+
+        const wealthForecasts = [
+            '2026年财运亨通，正财偏财俱佳。适合稳健投资，房产相关投资有利可图。3-6月是最佳投资时机，把握机会。',
+            '2026年财运平稳上升，收入增长稳定。下半年有意外之财，但需控制冲动消费。建议建立储蓄计划，为长远打算。',
+            '2026年财运起伏，需谨慎理财。避免高风险投资，积累优先。上半年开源，下半年节流，财务状况趋于稳定。',
+            '2026年偏财运佳，投资眼光独到。股票基金类投资可适度尝试，但切忌贪心。9-12月财运最旺，把握时机。',
+            '2026年正财稳定，工资性收入有保障。适合长期理财规划，教育投资和技能提升会带来长远回报。',
+            '2026年财富积累缓慢但扎实，避免被快速致富诱惑。房产和养老储蓄是重点，下半年财运逐渐改善。',
+        ];
+
+        const loveForecasts = [
+            '2026年感情运势佳，单身者有望在春夏之交邂逅真爱，可能通过朋友介绍或社交活动。有伴者感情升温，可考虑进入婚姻殿堂。',
+            '2026年感情稳定，需要用心经营。多创造浪漫时刻和共同回忆，感情会更加甜蜜。已婚者可能迎来新生命，家庭幸福美满。',
+            '2026年感情有考验，但也是成长的机会。坦诚沟通，共同面对挑战，感情会更加深厚。单身者不急于求成，缘分在秋季。',
+            '2026年桃花运旺盛，单身者选择众多，但需看清真心。有伴者需防第三者干扰，忠诚和信任最重要。',
+            '2026年感情以和为贵，避免争执。多关注伴侣感受，理解和包容是关键。单身者可能在工作场合遇到心仪对象。',
+            '2026年感情需要更多时间陪伴，工作繁忙不应成为冷落伴侣的借口。夏季适合求婚或度蜜月，增进感情。',
+        ];
+
+        // 基于三者组合生成个性化预测
+        const seed = (rashiIdx * 3 + dashaIdx * 7 + nakshatraIdx * 2) % 6;
+
         return {
-            career: forecasts.career[(rashiIdx + dashaIdx) % 3],
-            wealth: forecasts.wealth[(rashiIdx + dashaIdx + 1) % 3],
-            love: forecasts.love[(rashiIdx + dashaIdx + 2) % 3],
+            career: careerForecasts[seed],
+            wealth: wealthForecasts[(seed + 2) % 6],
+            love: loveForecasts[(seed + 4) % 6],
         };
     };
 
@@ -157,22 +132,57 @@ const VedicAstrology = () => {
                             <div className="p-4 rounded-lg" style={{ background: 'rgba(212, 168, 83, 0.1)', border: '1px solid var(--color-card-border)' }}>
                                 <h4 className="text-[var(--color-primary)] font-semibold mb-2">🌙 月亮星宿 (Nakshatra)</h4>
                                 <p className="text-[var(--color-text-light)] text-lg">{result.nakshatra.name}</p>
-                                <p className="text-[var(--color-text-muted)] text-sm mt-1">守护神: {result.nakshatra.deity}</p>
+                                <p className="text-[var(--color-text-muted)] text-sm mt-1">守护神: {result.nakshatra.deity} | 象征: {result.nakshatra.symbol}</p>
                                 <p className="text-[var(--color-text-muted)] text-sm">特质: {result.nakshatra.traits}</p>
+                                <p className="text-[var(--color-text-muted)] text-sm mt-2">特殊能力: {result.nakshatra.power}</p>
                             </div>
                             <div className="p-4 rounded-lg" style={{ background: 'rgba(212, 168, 83, 0.1)', border: '1px solid var(--color-card-border)' }}>
                                 <h4 className="text-[var(--color-primary)] font-semibold mb-2">♈ 月亮星座 (Rashi)</h4>
                                 <p className="text-[var(--color-text-light)] text-lg">{result.rashi.name}</p>
-                                <p className="text-[var(--color-text-muted)] text-sm mt-1">守护星: {result.rashi.ruler} | 元素: {result.rashi.element}</p>
+                                <p className="text-[var(--color-text-muted)] text-sm mt-1">守护星: {result.rashi.ruler} | 元素: {result.rashi.element} | 类型: {result.rashi.modality}</p>
                                 <p className="text-[var(--color-text-muted)] text-sm">特质: {result.rashi.traits}</p>
                             </div>
                         </div>
 
-                        <div className="p-4 rounded-lg" style={{ background: 'rgba(150, 100, 180, 0.15)', border: '1px solid rgba(150, 100, 180, 0.4)' }}>
-                            <h4 className="text-purple-300 font-semibold mb-2">⏰ 当前大运 (Mahadasha): {result.currentDasha.planet}大运</h4>
+                        {/* 组合分析部分 */}
+                        <div className="p-4 rounded-lg" style={{ background: 'rgba(100, 180, 150, 0.1)', border: '1px solid rgba(100, 180, 150, 0.4)' }}>
+                            <h4 className="text-green-300 font-semibold mb-2">🔮 综合分析 (Combined Analysis)</h4>
+                            <p className="text-[var(--color-text-light)] text-sm leading-relaxed">{result.combinedAnalysis}</p>
+                        </div>
+
+                        {/* 详细特征展开部分 */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="p-4 rounded-lg" style={{ background: 'rgba(100, 130, 180, 0.1)' }}>
+                                <h4 className="text-[var(--color-primary)] font-semibold mb-2">💪 星座优势</h4>
+                                <p className="text-[var(--color-text-light)] text-sm">{result.rashi.strengths}</p>
+                                <h4 className="text-[var(--color-primary)] font-semibold mb-2 mt-3">⚠️ 需要注意</h4>
+                                <p className="text-[var(--color-text-light)] text-sm">{result.rashi.weaknesses}</p>
+                            </div>
+                            <div className="p-4 rounded-lg" style={{ background: 'rgba(100, 130, 180, 0.1)' }}>
+                                <h4 className="text-[var(--color-primary)] font-semibold mb-2">💼 星宿职业指引</h4>
+                                <p className="text-[var(--color-text-light)] text-sm">{result.nakshatra.career}</p>
+                                <h4 className="text-[var(--color-primary)] font-semibold mb-2 mt-3">🏥 健康提示</h4>
+                                <p className="text-[var(--color-text-light)] text-sm">{result.nakshatra.health}</p>
+                            </div>
+                        </div>
+
+                        <div className="p-5 rounded-lg" style={{ background: 'rgba(150, 100, 180, 0.15)', border: '1px solid rgba(150, 100, 180, 0.4)' }}>
+                            <h4 className="text-purple-300 font-semibold mb-2">⏰ 当前大运 (Mahadasha): {result.currentDasha.symbol} {result.currentDasha.planet}大运</h4>
                             <p className="text-[var(--color-text-muted)] text-sm">运行周期: {result.dashaStartYear} - {result.dashaEndYear} ({result.currentDasha.duration}年)</p>
-                            <p className="text-[var(--color-text-light)] mt-2">{result.currentDasha.traits}</p>
-                            <p className="text-[var(--color-text-light)] text-sm mt-2 italic">"{result.currentDasha.advice}"</p>
+                            <p className="text-[var(--color-text-light)] mt-2 text-sm"><strong>特质：</strong>{result.currentDasha.traits}</p>
+                            <p className="text-[var(--color-text-light)] text-sm mt-2 italic">💡 <strong>建议：</strong>"{result.currentDasha.advice}"</p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
+                                <div>
+                                    <p className="text-yellow-300 text-xs font-semibold mb-1">⚡ 机遇</p>
+                                    <p className="text-[var(--color-text-light)] text-xs">{result.currentDasha.opportunities}</p>
+                                </div>
+                                <div>
+                                    <p className="text-orange-300 text-xs font-semibold mb-1">⚠️ 挑战</p>
+                                    <p className="text-[var(--color-text-light)] text-xs">{result.currentDasha.challenges}</p>
+                                </div>
+                            </div>
+                            <p className="text-[var(--color-text-muted)] text-xs mt-3"><strong>关系影响：</strong>{result.currentDasha.relationships}</p>
+                            <p className="text-purple-200 text-xs mt-2"><strong>🕉️ 灵性指引：</strong>{result.currentDasha.spiritual}</p>
                         </div>
 
                         <div className="p-4 rounded-lg" style={{ background: 'rgba(100, 130, 180, 0.1)' }}>
@@ -194,9 +204,21 @@ const VedicAstrology = () => {
                             </div>
                         </div>
 
-                        <div className="p-4 rounded-lg" style={{ background: 'rgba(100, 130, 180, 0.1)' }}>
-                            <h4 className="text-[var(--color-primary)] font-semibold mb-2">💼 适合职业</h4>
-                            <p className="text-[var(--color-text-light)] text-sm">{result.rashi.career}</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="p-4 rounded-lg" style={{ background: 'rgba(100, 130, 180, 0.1)' }}>
+                                <h4 className="text-[var(--color-primary)] font-semibold mb-2">💼 职业指引综合</h4>
+                                <p className="text-[var(--color-text-muted)] text-xs mb-2">根据星宿：</p>
+                                <p className="text-[var(--color-text-light)] text-sm">{result.nakshatra.career}</p>
+                                <p className="text-[var(--color-text-muted)] text-xs mb-2 mt-3">根据星座：</p>
+                                <p className="text-[var(--color-text-light)] text-sm">{result.rashi.career}</p>
+                            </div>
+                            <div className="p-4 rounded-lg" style={{ background: 'rgba(100, 130, 180, 0.1)' }}>
+                                <h4 className="text-[var(--color-primary)] font-semibold mb-2">💑 感情与财运</h4>
+                                <p className="text-[var(--color-text-muted)] text-xs mb-1">感情模式：</p>
+                                <p className="text-[var(--color-text-light)] text-sm mb-3">{result.rashi.love}</p>
+                                <p className="text-[var(--color-text-muted)] text-xs mb-1">财运倾向：</p>
+                                <p className="text-[var(--color-text-light)] text-sm">{result.rashi.wealth}</p>
+                            </div>
                         </div>
                     </div>
                 )}
