@@ -18,7 +18,7 @@ const getGenAI = (customKey?: string) => {
 };
 
 const getModel = () => {
-  return localStorage.getItem('user_model') || "gemini-1.5-flash";
+  return localStorage.getItem('user_model') || "gemini-pro";
 };
 
 export const interpretHexagram = async (

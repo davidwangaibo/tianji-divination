@@ -10,7 +10,7 @@ interface ApiKeyModalProps {
 export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, lang }) => {
     const [apiKey, setApiKey] = useState('');
     const [baseUrl, setBaseUrl] = useState('');
-    const [model, setModel] = useState('gemini-1.5-flash');
+    const [model, setModel] = useState('gemini-pro');
     const [showQr, setShowQr] = useState(false);
 
     useEffect(() => {
@@ -128,8 +128,8 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, lang 
                                     onChange={(e) => setModel(e.target.value)}
                                     className="w-full bg-slate-950/50 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all font-mono text-sm"
                                 >
-                                    <option value="gemini-1.5-flash">gemini-1.5-flash (推荐/Fast)</option>
-                                    <option value="gemini-2.0-flash-thinking-exp">gemini-2.0-thinking (新版/Smart)</option>
+                                    <option value="gemini-pro">gemini-pro (推荐/Stable)</option>
+                                    <option value="gemini-1.5-flash">gemini-1.5-flash (快速/Fast)</option>
                                     <option value="gemini-1.5-pro">gemini-1.5-pro (专业/Pro)</option>
                                 </select>
                             </div>
