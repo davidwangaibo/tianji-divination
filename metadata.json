@@ -1,0 +1,5 @@
+{
+  "name": "天机占卜",
+  "description": "专业的全能占卜应用，集成八字、紫微、塔罗、印度占星等多种预测方式，由 Gemini AI 提供万字深度解读。",
+  "requestFramePermissions": []
+}
