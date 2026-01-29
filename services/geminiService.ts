@@ -13,7 +13,7 @@ const getGenAI = (customKey?: string) => {
 };
 
 const getModel = () => {
-  return localStorage.getItem('user_model') || "gemini-1.5-flash";
+  return localStorage.getItem('user_model') || "gemini-1.5-flash-latest";
 };
 
 export const interpretHexagram = async (
