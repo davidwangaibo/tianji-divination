@@ -16,11 +16,11 @@ function App() {
   const [lotNumber, setLotNumber] = useState<number | null>(null); // For Guan Yin
   const [tarotCards, setTarotCards] = useState<TarotCard[] | null>(null);
   const [birthData, setBirthData] = useState<BirthData | null>(null);
-  
+
   const [question, setQuestion] = useState('');
   const [interpretation, setInterpretation] = useState('');
   const [loading, setLoading] = useState(false);
-  
+
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const handleCoinComplete = (lines: YaoValue[]) => {
@@ -51,7 +51,7 @@ function App() {
     // For Bazi/Vedic, question is optional, but we check if birthData exists
     if ((method === DivinationMethod.BAZI || method === DivinationMethod.VEDIC) && !birthData) return;
     if (method !== DivinationMethod.BAZI && method !== DivinationMethod.VEDIC && !question.trim()) return;
-    
+
     setLoading(true);
     let result = '';
 
@@ -66,7 +66,7 @@ function App() {
     } else if (hexagram) {
       result = await interpretHexagram(hexagram, question);
     }
-    
+
     setInterpretation(result);
     setLoading(false);
   };
@@ -108,7 +108,7 @@ function App() {
   const isTarot = method === DivinationMethod.TAROT;
   const isBazi = method === DivinationMethod.BAZI;
   const isVedic = method === DivinationMethod.VEDIC;
-  
+
   const hasResult = hexagram || lotNumber || tarotCards || birthData;
 
   const getMethodName = () => {
@@ -123,21 +123,41 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#0f172a] bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] text-slate-200 flex flex-col font-sans selection:bg-amber-500/30">
-      
+
       {/* Header */}
       <header className="p-6 text-center border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 shadow-lg">
         <h1 className="text-3xl md:text-4xl font-cinzel font-bold bg-gradient-to-r from-amber-200 via-amber-500 to-amber-200 bg-clip-text text-transparent drop-shadow-sm tracking-wider">
           天机占卜
         </h1>
-        <p className="text-slate-400 text-xs md:text-sm mt-2 tracking-[0.3em] uppercase opacity-80">易经 • 八字 • 塔罗 • 灵签 • 印度占星</p>
+        <nav className="flex justify-center flex-wrap gap-x-3 gap-y-2 mt-3 text-slate-400 text-xs md:text-sm tracking-widest uppercase opacity-90">
+          {[
+            { name: '易经', method: DivinationMethod.COIN },
+            { name: '梅花', method: DivinationMethod.TIME },
+            { name: '八字', method: DivinationMethod.BAZI },
+            { name: '塔罗', method: DivinationMethod.TAROT },
+            { name: '灵签', method: DivinationMethod.GUAN_YIN },
+            { name: '印度占星', method: DivinationMethod.VEDIC },
+          ].map((item, index) => (
+            <React.Fragment key={item.name}>
+              {index > 0 && <span className="opacity-30 select-none">•</span>}
+              <button
+                onClick={() => setMethod(item.method)}
+                className={`hover:text-amber-400 transition-all duration-300 relative group ${method === item.method ? 'text-amber-500 font-bold' : ''}`}
+              >
+                {item.name}
+                <span className={`absolute -bottom-1 left-0 w-0 h-[1px] bg-amber-500 transition-all duration-300 group-hover:w-full ${method === item.method ? 'w-full' : ''}`}></span>
+              </button>
+            </React.Fragment>
+          ))}
+        </nav>
       </header>
 
       <main className="flex-grow container mx-auto px-4 py-8 max-w-5xl">
-        
+
         {/* Method Selection */}
         {!method && (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 mt-12 animate-fade-in-up">
-            <button 
+            <button
               onClick={() => setMethod(DivinationMethod.COIN)}
               className="group relative p-6 bg-slate-800/80 rounded-2xl border border-slate-700 hover:border-amber-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(245,158,11,0.2)] text-left backdrop-blur-sm"
             >
@@ -150,7 +170,7 @@ function App() {
               </p>
             </button>
 
-            <button 
+            <button
               onClick={() => setMethod(DivinationMethod.TIME)}
               className="group relative p-6 bg-slate-800/80 rounded-2xl border border-slate-700 hover:border-indigo-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(99,102,241,0.2)] text-left backdrop-blur-sm"
             >
@@ -163,7 +183,7 @@ function App() {
               </p>
             </button>
 
-            <button 
+            <button
               onClick={() => setMethod(DivinationMethod.BAZI)}
               className="group relative p-6 bg-slate-800/80 rounded-2xl border border-slate-700 hover:border-amber-700 transition-all duration-300 hover:shadow-[0_0_30px_rgba(180,83,9,0.2)] text-left backdrop-blur-sm"
             >
@@ -176,7 +196,7 @@ function App() {
               </p>
             </button>
 
-            <button 
+            <button
               onClick={() => setMethod(DivinationMethod.GUAN_YIN)}
               className="group relative p-6 bg-slate-800/80 rounded-2xl border border-slate-700 hover:border-red-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(239,68,68,0.2)] text-left backdrop-blur-sm"
             >
@@ -189,7 +209,7 @@ function App() {
               </p>
             </button>
 
-             <button 
+            <button
               onClick={() => setMethod(DivinationMethod.TAROT)}
               className="group relative p-6 bg-slate-800/80 rounded-2xl border border-slate-700 hover:border-purple-500 transition-all duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.2)] text-left backdrop-blur-sm"
             >
@@ -202,7 +222,7 @@ function App() {
               </p>
             </button>
 
-            <button 
+            <button
               onClick={() => setMethod(DivinationMethod.VEDIC)}
               className="group relative p-6 bg-slate-800/80 rounded-2xl border border-slate-700 hover:border-indigo-400 transition-all duration-300 hover:shadow-[0_0_30px_rgba(129,140,248,0.2)] text-left backdrop-blur-sm"
             >
@@ -228,9 +248,9 @@ function App() {
                 当前模式: {getMethodName()}
               </span>
             </div>
-            
+
             {method === DivinationMethod.COIN ? (
-              <CoinToss onComplete={handleCoinComplete} onReset={() => {}} />
+              <CoinToss onComplete={handleCoinComplete} onReset={() => { }} />
             ) : method === DivinationMethod.TIME ? (
               <TimeGua onComplete={handleTimeComplete} />
             ) : method === DivinationMethod.GUAN_YIN ? (
@@ -246,7 +266,7 @@ function App() {
         {/* Result Display */}
         {hasResult && (
           <div className="mt-8 grid lg:grid-cols-2 gap-8 animate-fade-in pb-12">
-            
+
             {/* Left Column: Visuals */}
             <div className="flex flex-col gap-6">
               <div className={`bg-slate-800/50 p-6 rounded-xl border flex flex-col items-center shadow-lg backdrop-blur-md ${isTarot ? 'border-purple-500/30' : isVedic ? 'border-indigo-500/30' : 'border-slate-700'}`}>
@@ -283,39 +303,39 @@ function App() {
                 )}
 
                 {isGuanYin && lotNumber && (
-                   <div className="flex flex-col items-center animate-fade-in-up">
-                      <div className="w-24 h-64 bg-amber-100 border-2 border-red-800 rounded shadow-2xl flex flex-col items-center py-4 relative overflow-hidden">
-                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/rice-paper.png')] opacity-50"></div>
-                        <div className="text-red-800 font-bold text-sm mb-2 border-b border-red-800/50 pb-1">观音灵签</div>
-                        <div className="flex-grow flex items-center justify-center">
-                          <span className="text-3xl font-bold text-black writing-vertical font-serif tracking-widest">
-                            第{toChineseNum(lotNumber)}签
-                          </span>
-                        </div>
-                        <div className="text-red-800 font-bold text-xl mt-2">{lotNumber}</div>
+                  <div className="flex flex-col items-center animate-fade-in-up">
+                    <div className="w-24 h-64 bg-amber-100 border-2 border-red-800 rounded shadow-2xl flex flex-col items-center py-4 relative overflow-hidden">
+                      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/rice-paper.png')] opacity-50"></div>
+                      <div className="text-red-800 font-bold text-sm mb-2 border-b border-red-800/50 pb-1">观音灵签</div>
+                      <div className="flex-grow flex items-center justify-center">
+                        <span className="text-3xl font-bold text-black writing-vertical font-serif tracking-widest">
+                          第{toChineseNum(lotNumber)}签
+                        </span>
                       </div>
-                      <p className="mt-6 text-amber-200 text-lg font-bold">第 {toChineseNum(lotNumber)} 签</p>
-                      <p className="text-slate-400 text-sm mt-1">请诚心在右侧输入所求之事，解签大师将为您详批。</p>
-                   </div>
+                      <div className="text-red-800 font-bold text-xl mt-2">{lotNumber}</div>
+                    </div>
+                    <p className="mt-6 text-amber-200 text-lg font-bold">第 {toChineseNum(lotNumber)} 签</p>
+                    <p className="text-slate-400 text-sm mt-1">请诚心在右侧输入所求之事，解签大师将为您详批。</p>
+                  </div>
                 )}
 
                 {isTarot && tarotCards && (
                   <div className="w-full grid grid-cols-1 gap-4">
                     {tarotCards.map((card) => (
                       <div key={card.id} className="flex items-center gap-4 bg-slate-900/40 p-3 rounded-lg border border-purple-500/20">
-                         <div className={`w-12 h-20 bg-gradient-to-b from-slate-300 to-slate-400 rounded flex items-center justify-center text-[8px] text-slate-900 font-bold shrink-0 ${card.isReversed ? 'rotate-180' : ''}`}>
+                        <div className={`w-12 h-20 bg-gradient-to-b from-slate-300 to-slate-400 rounded flex items-center justify-center text-[8px] text-slate-900 font-bold shrink-0 ${card.isReversed ? 'rotate-180' : ''}`}>
+                          {card.name}
+                        </div>
+                        <div>
+                          <div className="text-xs text-purple-400 uppercase tracking-widest font-bold">
+                            {card.position === 'past' ? '过去' : card.position === 'present' ? '现在' : '未来'}
+                          </div>
+                          <div className="text-slate-200 font-bold flex items-center gap-2">
                             {card.name}
-                         </div>
-                         <div>
-                           <div className="text-xs text-purple-400 uppercase tracking-widest font-bold">
-                             {card.position === 'past' ? '过去' : card.position === 'present' ? '现在' : '未来'}
-                           </div>
-                           <div className="text-slate-200 font-bold flex items-center gap-2">
-                             {card.name} 
-                             {card.isReversed && <span className="text-[10px] bg-red-900/50 text-red-200 px-1 rounded">逆</span>}
-                           </div>
-                           <div className="text-xs text-slate-500 font-serif italic">{card.nameEn}</div>
-                         </div>
+                            {card.isReversed && <span className="text-[10px] bg-red-900/50 text-red-200 px-1 rounded">逆</span>}
+                          </div>
+                          <div className="text-xs text-slate-500 font-serif italic">{card.nameEn}</div>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -325,7 +345,7 @@ function App() {
                   <div className="w-full flex flex-col items-center space-y-4 animate-fade-in-up">
                     <div className={`p-4 border rounded-lg w-full ${isVedic ? 'bg-indigo-900/20 border-indigo-600/30' : 'bg-amber-900/20 border-amber-600/30'}`}>
                       <h4 className={`text-sm font-bold uppercase mb-2 text-center ${isVedic ? 'text-indigo-400' : 'text-amber-400'}`}>
-                         {isVedic ? '星盘数据 (Chart Details)' : '命主信息'}
+                        {isVedic ? '星盘数据 (Chart Details)' : '命主信息'}
                       </h4>
                       <div className="grid grid-cols-2 gap-4 text-sm text-slate-300">
                         <div className="flex flex-col items-center">
@@ -340,7 +360,7 @@ function App() {
                           <span className="text-slate-500 text-xs">性别</span>
                           <span>{birthData.gender === 'male' ? '男' : '女'}</span>
                         </div>
-                         {birthData.location && (
+                        {birthData.location && (
                           <div className="flex flex-col items-center col-span-2">
                             <span className="text-slate-500 text-xs">出生地点</span>
                             <span>{birthData.location}</span>
@@ -353,12 +373,12 @@ function App() {
                     </p>
                   </div>
                 )}
-                
+
                 {isHexagramMethod && !isMoving && (
                   <p className="mt-4 text-sm text-slate-500 italic">此卦为静卦，无动爻，事态稳定。</p>
                 )}
               </div>
-              
+
               {/* Instructions if not yet interpreted */}
               {!interpretation && isHexagramMethod && (
                 <div className="bg-amber-900/10 border border-amber-900/30 p-4 rounded-lg text-sm text-amber-200/70">
@@ -375,7 +395,7 @@ function App() {
                     <Sparkles className={isTarot ? "text-purple-500" : isVedic ? 'text-indigo-400' : "text-amber-500"} size={20} />
                     {isGuanYin ? '祈求解签' : isTarot ? '冥想问题' : (isBazi || isVedic) ? '重点关注' : '诚心叩问'}
                   </h3>
-                  
+
                   <div className="flex-grow flex flex-col gap-4">
                     <div>
                       <label className="block text-slate-400 text-xs uppercase tracking-wider mb-2 font-bold">
@@ -385,14 +405,14 @@ function App() {
                         value={question}
                         onChange={(e) => setQuestion(e.target.value)}
                         placeholder={
-                          isTarot ? "请集中精神，描述您想询问的关于感情、事业或生活的具体困惑..." : 
-                          (isBazi || isVedic) ? "如需了解特定年份或事件（如：2026年运势、婚姻、转行），请在此备注..." :
-                          "请具体描述您的困惑..."
+                          isTarot ? "请集中精神，描述您想询问的关于感情、事业或生活的具体困惑..." :
+                            (isBazi || isVedic) ? "如需了解特定年份或事件（如：2026年运势、婚姻、转行），请在此备注..." :
+                              "请具体描述您的困惑..."
                         }
                         className={`w-full h-40 bg-slate-900/80 border rounded-lg p-4 text-slate-200 focus:ring-2 focus:border-transparent focus:outline-none resize-none leading-relaxed placeholder:text-slate-600 ${isTarot ? 'border-purple-500/30 focus:ring-purple-500' : isVedic ? 'border-indigo-500/30 focus:ring-indigo-500' : 'border-slate-600 focus:ring-amber-500'}`}
                       />
                     </div>
-                    
+
                     <button
                       onClick={handleConsultOracle}
                       // For Bazi/Vedic, question can be empty
@@ -416,32 +436,32 @@ function App() {
               ) : (
                 <div className={`bg-slate-800/90 p-6 sm:p-8 rounded-xl border h-full overflow-hidden flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.5)] relative ${isTarot ? 'border-purple-500/30' : isVedic ? 'border-indigo-500/30' : 'border-amber-500/30'}`}>
                   <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-transparent to-transparent ${isTarot ? 'via-purple-500' : isVedic ? 'via-indigo-500' : 'via-amber-500'}`}></div>
-                  
+
                   <h3 className={`text-xl font-bold mb-4 border-b border-slate-700/50 pb-4 flex justify-between items-center shrink-0 ${isTarot ? 'text-purple-400' : isVedic ? 'text-indigo-400' : 'text-amber-400'}`}>
                     <span>{isGuanYin ? '灵签详解' : isTarot ? '塔罗指引' : isVedic ? '星盘解读' : '大师批语'}</span>
                     <span className="text-xs font-normal text-slate-500 bg-slate-900 px-2 py-1 rounded">AI 生成</span>
                   </h3>
-                  
+
                   <div className="overflow-y-auto custom-scrollbar pr-2 flex-grow">
                     <div className={`text-slate-300 prose prose-invert max-w-none prose-headings:text-opacity-90 prose-strong:text-opacity-90 ${isTarot ? 'prose-headings:text-purple-200 prose-strong:text-purple-200 prose-li:marker:text-purple-500' : isVedic ? 'prose-headings:text-indigo-200 prose-strong:text-indigo-200 prose-li:marker:text-indigo-500' : 'prose-headings:text-amber-200 prose-strong:text-amber-100 prose-li:marker:text-amber-600'}`}>
-                       {interpretation.split('\n').map((line, i) => (
-                         <p key={i} className="mb-2 leading-relaxed text-sm md:text-base">
-                           {line.replace(/\*\*(.*?)\*\*/g, (match, p1) => `<strong>${p1}</strong>`)
-                                .split('<strong>').reduce((acc: any[], part, idx) => {
-                                   if (idx === 0) return [part];
-                                   const [bold, rest] = part.split('</strong>');
-                                   return [...acc, <strong key={idx} className={`px-1 rounded ${isTarot ? 'text-purple-200/90 bg-purple-900/20' : isVedic ? 'text-indigo-200/90 bg-indigo-900/20' : 'text-amber-200/90 bg-amber-900/20'}`}>{bold}</strong>, rest];
-                                }, [])
-                           }
-                         </p>
-                       ))}
+                      {interpretation.split('\n').map((line, i) => (
+                        <p key={i} className="mb-2 leading-relaxed text-sm md:text-base">
+                          {line.replace(/\*\*(.*?)\*\*/g, (match, p1) => `<strong>${p1}</strong>`)
+                            .split('<strong>').reduce((acc: any[], part, idx) => {
+                              if (idx === 0) return [part];
+                              const [bold, rest] = part.split('</strong>');
+                              return [...acc, <strong key={idx} className={`px-1 rounded ${isTarot ? 'text-purple-200/90 bg-purple-900/20' : isVedic ? 'text-indigo-200/90 bg-indigo-900/20' : 'text-amber-200/90 bg-amber-900/20'}`}>{bold}</strong>, rest];
+                            }, [])
+                          }
+                        </p>
+                      ))}
                     </div>
                     <div ref={bottomRef} />
                   </div>
-                  
+
                   <div className="mt-4 pt-4 border-t border-slate-700/50 flex justify-center shrink-0">
                     <button onClick={resetDivination} className="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm rounded-full transition-colors flex items-center gap-2">
-                       <RotateCcw size={14} /> 再次问卜
+                      <RotateCcw size={14} /> 再次问卜
                     </button>
                   </div>
                 </div>
