@@ -3,14 +3,17 @@ import { YaoValue } from '../types';
 import { YaoLine } from './YaoLine';
 import { getHexagramInfo } from '../utils/iching';
 
+import { Language } from '../types';
+
 interface HexagramVisualProps {
   lines: YaoValue[];
   title: string;
   highlightMoving?: boolean;
+  lang?: Language;
 }
 
-export const HexagramVisual: React.FC<HexagramVisualProps> = ({ lines, title, highlightMoving = false }) => {
-  const { lower, upper, fullName } = getHexagramInfo(lines);
+export const HexagramVisual: React.FC<HexagramVisualProps> = ({ lines, title, highlightMoving = false, lang = 'zh' }) => {
+  const { lower, upper, fullName } = getHexagramInfo(lines, lang);
 
   // We need to render from Top to Bottom visually
   const upperSection = [...lines.slice(3, 6)].reverse();
@@ -22,7 +25,7 @@ export const HexagramVisual: React.FC<HexagramVisualProps> = ({ lines, title, hi
         <h4 className="text-slate-400 text-xs uppercase tracking-widest mb-1">{title}</h4>
         <h3 className="text-2xl font-cinzel font-bold text-amber-400">{fullName}</h3>
       </div>
-      
+
       {/* Upper Trigram */}
       <div className="w-full mb-1 relative pl-6 pr-6">
         <div className="absolute left-0 top-1/2 -translate-y-1/2 text-xs text-slate-400 text-right w-5">

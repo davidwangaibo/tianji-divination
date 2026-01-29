@@ -265,15 +265,15 @@ export default function App() {
             </div>
 
             {method === DivinationMethod.COIN ? (
-              <CoinToss onComplete={handleCoinComplete} onReset={() => { }} />
+              <CoinToss onComplete={handleCoinComplete} onReset={() => { }} lang={lang} />
             ) : method === DivinationMethod.TIME ? (
-              <TimeGua onComplete={handleTimeComplete} />
+              <TimeGua onComplete={handleTimeComplete} lang={lang} />
             ) : method === DivinationMethod.GUAN_YIN ? (
-              <GuanYinCian onComplete={handleGuanYinComplete} />
+              <GuanYinCian onComplete={handleGuanYinComplete} lang={lang} />
             ) : method === DivinationMethod.BAZI || method === DivinationMethod.VEDIC ? (
-              <BirthChartInput onComplete={handleBirthDataComplete} method={method} />
+              <BirthChartInput onComplete={handleBirthDataComplete} method={method} lang={lang} />
             ) : (
-              <TarotDeck onComplete={handleTarotComplete} />
+              <TarotDeck onComplete={handleTarotComplete} lang={lang} />
             )}
           </div>
         )}
@@ -302,7 +302,7 @@ export default function App() {
                 {isHexagramMethod && hexagram && (
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-8 w-full">
                     <div className="flex flex-col items-center w-full">
-                      <HexagramVisual lines={hexagram.lines} title="本卦 (当前)" highlightMoving />
+                      <HexagramVisual lines={hexagram.lines} title={lang === 'zh' ? "本卦 (当前)" : "Current Hexagram"} highlightMoving lang={lang} />
                     </div>
                     {isMoving && (
                       <div className="hidden sm:flex text-slate-500">
@@ -311,7 +311,7 @@ export default function App() {
                     )}
                     {isMoving && transformedLines && (
                       <div className="flex flex-col items-center w-full animate-fade-in-right">
-                        <HexagramVisual lines={transformedLines} title="之卦 (结果)" />
+                        <HexagramVisual lines={transformedLines} title={lang === 'zh' ? "之卦 (结果)" : "Result Hexagram"} lang={lang} />
                       </div>
                     )}
                   </div>
