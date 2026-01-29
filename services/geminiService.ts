@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { HexagramData, TarotCard, BirthData, Language } from "../types";
 import { getHexagramInfo, getTransformedHexagram, hasMovingLines, toChineseNum } from "../utils/iching";
 
@@ -9,12 +9,7 @@ const getGenAI = (customKey?: string) => {
     throw new Error('API Key not found');
   }
 
-  const baseUrl = localStorage.getItem('user_base_url');
-  if (baseUrl) {
-    return new GoogleGenAI({ apiKey, baseURL: baseUrl });
-  }
-
-  return new GoogleGenAI({ apiKey });
+  return new GoogleGenerativeAI(apiKey);
 };
 
 const getModel = () => {
@@ -137,11 +132,9 @@ export const interpretHexagram = async (
     `;
     }
 
-    const response = await ai.models.generateContent({
-      model: getModel(),
-      contents: prompt,
-    });
-    return response.text || (lang === 'zh' ? "云深不知处，天机暂未明。请稍后再试。" : "The clouds are thick, the oracle is silent. Please try again later.");
+    const model = ai.getGenerativeModel({ model: getModel() });
+    const response = await model.generateContent(prompt);
+    return response.response.text() || (lang === 'zh' ? "云深不知处，天机暂未明。请稍后再试。" : "The clouds are thick, the oracle is silent. Please try again later.");
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     if (error.message === 'API Key not found') return lang === 'zh' ? "请在设置中配置 API Key。" : "Please configure API Key in settings.";
@@ -246,11 +239,9 @@ export const interpretGuanYin = async (
 
   try {
     const ai = getGenAI();
-    const response = await ai.models.generateContent({
-      model: getModel(),
-      contents: prompt,
-    });
-    return response.text || (lang === 'zh' ? "佛光隐现，请稍后再试。" : "The Buddha's light is faint, please try again.");
+    const model = ai.getGenerativeModel({ model: getModel() });
+    const response = await model.generateContent(prompt);
+    return response.response.text() || (lang === 'zh' ? "佛光隐现，请稍后再试。" : "The Buddha's light is faint, please try again.");
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     if (error.message === 'API Key not found') return lang === 'zh' ? "请配置 API Key。" : "Please configure API Key.";
@@ -361,11 +352,9 @@ export const interpretTarot = async (
 
   try {
     const ai = getGenAI();
-    const response = await ai.models.generateContent({
-      model: getModel(),
-      contents: prompt,
-    });
-    return response.text || (lang === 'zh' ? "水晶球迷雾重重，请稍后再试。" : "The crystal ball is misty, please try again.");
+    const model = ai.getGenerativeModel({ model: getModel() });
+    const response = await model.generateContent(prompt);
+    return response.response.text() || (lang === 'zh' ? "水晶球迷雾重重，请稍后再试。" : "The crystal ball is misty, please try again.");
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     if (error.message === 'API Key not found') return lang === 'zh' ? "请配置 API Key。" : "Please configure API Key.";
@@ -485,11 +474,9 @@ export const interpretBazi = async (
 
   try {
     const ai = getGenAI();
-    const response = await ai.models.generateContent({
-      model: getModel(),
-      contents: prompt,
-    });
-    return response.text || (lang === 'zh' ? "天干地支运转繁复，暂未算出结果，请稍后再试。" : "The celestial stems turn complexly, please try again.");
+    const model = ai.getGenerativeModel({ model: getModel() });
+    const response = await model.generateContent(prompt);
+    return response.response.text() || (lang === 'zh' ? "天干地支运转繁复，暂未算出结果，请稍后再试。" : "The celestial stems turn complexly, please try again.");
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     if (error.message === 'API Key not found') return lang === 'zh' ? "请配置 API Key。" : "Please configure API Key.";
@@ -604,11 +591,9 @@ export const interpretVedic = async (
 
   try {
     const ai = getGenAI();
-    const response = await ai.models.generateContent({
-      model: getModel(),
-      contents: prompt,
-    });
-    return response.text || (lang === 'zh' ? "星海浩渺，云雾遮眼，请稍后再试。" : "The stars are vast and veiled, please try again.");
+    const model = ai.getGenerativeModel({ model: getModel() });
+    const response = await model.generateContent(prompt);
+    return response.response.text() || (lang === 'zh' ? "星海浩渺，云雾遮眼，请稍后再试。" : "The stars are vast and veiled, please try again.");
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     if (error.message === 'API Key not found') return lang === 'zh' ? "请配置 API Key。" : "Please configure API Key.";
