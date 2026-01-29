@@ -2,7 +2,14 @@ import { GoogleGenAI } from "@google/genai";
 import { HexagramData, TarotCard, BirthData, Language } from "../types";
 import { getHexagramInfo, getTransformedHexagram, hasMovingLines, toChineseNum } from "../utils/iching";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+const getGenAI = (customKey?: string) => {
+  // @ts-ignore
+  const apiKey = customKey || localStorage.getItem('user_api_key') || import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_API_KEY;
+  if (!apiKey) {
+    throw new Error('API Key not found');
+  }
+  return new GoogleGenAI({ apiKey });
+};
 
 const MODEL = "gemini-2.0-flash-thinking-exp";
 
@@ -11,25 +18,28 @@ export const interpretHexagram = async (
   question: string,
   lang: Language = 'zh'
 ): Promise<string> => {
-  // Basic Info
-  const originalInfo = getHexagramInfo(hexagram.lines);
-  const transformedLines = getTransformedHexagram(hexagram.lines);
-  const transformedInfo = getHexagramInfo(transformedLines);
-  const isMoving = hasMovingLines(hexagram.lines);
+  try {
+    const ai = getGenAI();
 
-  // Identify moving lines indices (1-based)
-  const movingLinesIndices = hexagram.lines
-    .map((val, idx) => (val === 6 || val === 9 ? idx + 1 : null))
-    .filter(val => val !== null);
+    // Basic Info
+    const originalInfo = getHexagramInfo(hexagram.lines);
+    const transformedLines = getTransformedHexagram(hexagram.lines);
+    const transformedInfo = getHexagramInfo(transformedLines);
+    const isMoving = hasMovingLines(hexagram.lines);
 
-  const methodText = hexagram.method === 'coin' ?
-    (lang === 'zh' ? '铜钱起卦 (六爻)' : 'Coin Toss (Six Lines)') :
-    (lang === 'zh' ? '梅花易数 (时间起卦)' : 'Plum Blossom (Time Based)');
+    // Identify moving lines indices (1-based)
+    const movingLinesIndices = hexagram.lines
+      .map((val, idx) => (val === 6 || val === 9 ? idx + 1 : null))
+      .filter(val => val !== null);
 
-  let prompt = '';
+    const methodText = hexagram.method === 'coin' ?
+      (lang === 'zh' ? '铜钱起卦 (六爻)' : 'Coin Toss (Six Lines)') :
+      (lang === 'zh' ? '梅花易数 (时间起卦)' : 'Plum Blossom (Time Based)');
 
-  if (lang === 'zh') {
-    prompt = `
+    let prompt = '';
+
+    if (lang === 'zh') {
+      prompt = `
       你是一位精通《易经》、《梅花易数》及古法命理的国学大师。请针对用户的问题进行深度、详尽的推演。
       
       【求测背景】
@@ -73,8 +83,8 @@ export const interpretHexagram = async (
 
       语气要求：引经据典，字字珠玑，既有古大师的风骨，又有对求测者的关怀。
     `;
-  } else {
-    prompt = `
+    } else {
+      prompt = `
       You are a wise Master of I Ching (Book of Changes) and Plum Blossom Numerology. Please provide a deep and detailed interpretation for the user's question in English.
 
       [Context]
@@ -117,17 +127,17 @@ export const interpretHexagram = async (
 
       Tone: Mystical, profound, empathetic, and wise.
     `;
-  }
+    }
 
-  try {
     const response = await ai.models.generateContent({
       model: MODEL,
       contents: prompt,
       config: { thinkingConfig: { thinkingBudget: 0 } }
     });
     return response.text || (lang === 'zh' ? "云深不知处，天机暂未明。请稍后再试。" : "The clouds are thick, the oracle is silent. Please try again later.");
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini API Error:", error);
+    if (error.message === 'API Key not found') return lang === 'zh' ? "请在设置中配置 API Key。" : "Please configure API Key in settings.";
     return lang === 'zh' ? "连接神谕时发生错误，请检查网络后重试。" : "Error connecting to the Oracle. Please check your network.";
   }
 };
@@ -228,15 +238,17 @@ export const interpretGuanYin = async (
   }
 
   try {
+    const ai = getGenAI();
     const response = await ai.models.generateContent({
       model: MODEL,
       contents: prompt,
       config: { thinkingConfig: { thinkingBudget: 0 } }
     });
     return response.text || (lang === 'zh' ? "佛光隐现，请稍后再试。" : "The Buddha's light is faint, please try again.");
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini API Error:", error);
-    return lang === 'zh' ? "连接神谕时发生错误，请检查网络后重试。" : "Error connecting to the divine. Please check network.";
+    if (error.message === 'API Key not found') return lang === 'zh' ? "请配置 API Key。" : "Please configure API Key.";
+    return lang === 'zh' ? "连接神谕时发生错误，请检查网络。" : "Error connecting to the divine. Please check network.";
   }
 };
 
@@ -342,14 +354,16 @@ export const interpretTarot = async (
   }
 
   try {
+    const ai = getGenAI();
     const response = await ai.models.generateContent({
       model: MODEL,
       contents: prompt,
       config: { thinkingConfig: { thinkingBudget: 0 } }
     });
     return response.text || (lang === 'zh' ? "水晶球迷雾重重，请稍后再试。" : "The crystal ball is misty, please try again.");
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini API Error:", error);
+    if (error.message === 'API Key not found') return lang === 'zh' ? "请配置 API Key。" : "Please configure API Key.";
     return lang === 'zh' ? "连接宇宙能量时发生中断，请检查网络。" : "Connection to cosmic energy interrupted.";
   }
 };
@@ -465,14 +479,16 @@ export const interpretBazi = async (
   }
 
   try {
+    const ai = getGenAI();
     const response = await ai.models.generateContent({
       model: MODEL,
       contents: prompt,
       config: { thinkingConfig: { thinkingBudget: 0 } }
     });
     return response.text || (lang === 'zh' ? "天干地支运转繁复，暂未算出结果，请稍后再试。" : "The celestial stems turn complexly, please try again.");
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini API Error:", error);
+    if (error.message === 'API Key not found') return lang === 'zh' ? "请配置 API Key。" : "Please configure API Key.";
     return lang === 'zh' ? "连接命运齿轮时发生错误，请检查网络。" : "Error connecting to the gears of destiny.";
   }
 };
@@ -583,14 +599,16 @@ export const interpretVedic = async (
   }
 
   try {
+    const ai = getGenAI();
     const response = await ai.models.generateContent({
       model: MODEL,
       contents: prompt,
       config: { thinkingConfig: { thinkingBudget: 0 } }
     });
     return response.text || (lang === 'zh' ? "星海浩渺，云雾遮眼，请稍后再试。" : "The stars are vast and veiled, please try again.");
-  } catch (error) {
+  } catch (error: any) {
     console.error("Gemini API Error:", error);
+    if (error.message === 'API Key not found') return lang === 'zh' ? "请配置 API Key。" : "Please configure API Key.";
     return lang === 'zh' ? "连接宇宙能量场时发生中断，请检查网络。" : "Connection to universal energy interrupted.";
   }
 };
