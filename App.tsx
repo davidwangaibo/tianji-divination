@@ -132,14 +132,20 @@ export default function App() {
 
       {/* Header */}
       <header className="p-6 text-center border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 shadow-lg relative">
-        <button
-          onClick={() => setLang(l => l === 'zh' ? 'en' : 'zh')}
-          className="absolute right-4 top-4 p-2 text-slate-400 hover:text-amber-400 transition-colors rounded-full hover:bg-slate-800 border border-transparent hover:border-slate-700"
-          title={lang === 'zh' ? "Switch to English" : "切换为中文"}
-        >
-          <Languages size={20} />
-          <span className="absolute -bottom-4 right-0 text-[10px] w-full text-center font-bold tracking-widest">{lang.toUpperCase()}</span>
-        </button>
+        <div className="absolute right-4 top-4 flex items-center bg-slate-800/80 rounded-full p-1 border border-slate-700/50 backdrop-blur-md shadow-lg z-50">
+          <button
+            onClick={() => setLang('zh')}
+            className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all duration-300 ${lang === 'zh' ? 'bg-amber-600 text-white shadow-[0_0_10px_rgba(217,119,6,0.5)]' : 'text-slate-400 hover:text-amber-200'}`}
+          >
+            中文
+          </button>
+          <button
+            onClick={() => setLang('en')}
+            className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all duration-300 ${lang === 'en' ? 'bg-indigo-600 text-white shadow-[0_0_10px_rgba(79,70,229,0.5)]' : 'text-slate-400 hover:text-indigo-200'}`}
+          >
+            English
+          </button>
+        </div>
 
         <h1 className="text-3xl md:text-4xl font-cinzel font-bold bg-gradient-to-r from-amber-200 via-amber-500 to-amber-200 bg-clip-text text-transparent drop-shadow-sm tracking-wider">
           {t.title}
