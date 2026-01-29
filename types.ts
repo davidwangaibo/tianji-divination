@@ -58,7 +58,7 @@ export interface DivinationResult {
 export const BAGUA_DATA: Record<number, TrigramInfo> = {
   1: { id: 1, name: '乾', nature: '天', element: '金', character: '健' }, // [1,1,1] -> 7
   2: { id: 2, name: '兑', nature: '泽', element: '金', character: '说' }, // [0,1,1] -> 3 (Note: binary conversion depends on bit order)
-  3: { id: 3, name: '离', nature: '火', element: '火', character: '丽' }, 
+  3: { id: 3, name: '离', nature: '火', element: '火', character: '丽' },
   4: { id: 4, name: '震', nature: '雷', element: '木', character: '动' },
   5: { id: 5, name: '巽', nature: '风', element: '木', character: '入' },
   6: { id: 6, name: '坎', nature: '水', element: '水', character: '陷' },
@@ -68,6 +68,8 @@ export const BAGUA_DATA: Record<number, TrigramInfo> = {
 
 export const BAGUA_MAP_ARR: Record<number, number[]> = {
   1: [1, 1, 1],
-  2: [0, 1, 1], 
+  2: [0, 1, 1],
   // ... (Mapping used in utils logic mostly)
 };
+
+export type Language = 'zh' | 'en';

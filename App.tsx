@@ -6,11 +6,13 @@ import { HexagramVisual } from './components/HexagramVisual';
 import { TarotDeck } from './components/TarotDeck';
 import { BirthChartInput } from './components/BirthChartInput';
 import { interpretHexagram, interpretGuanYin, interpretTarot, interpretBazi, interpretVedic } from './services/geminiService';
-import { DivinationMethod, HexagramData, YaoValue, TarotCard, BirthData } from './types';
+import { DivinationMethod, HexagramData, YaoValue, TarotCard, BirthData, Language } from './types';
 import { getTransformedHexagram, hasMovingLines, toChineseNum } from './utils/iching';
-import { Sparkles, Moon, Sun, ArrowRight, BookOpen, RotateCcw, Archive, Star, Home, Calendar, Flower } from 'lucide-react';
+import { Sparkles, Moon, Sun, ArrowRight, BookOpen, RotateCcw, Archive, Star, Home, Calendar, Flower, Languages } from 'lucide-react';
+import { TRANSLATIONS } from './src/constants/translations';
 
 function App() {
+  const [lang, setLang] = useState<Language>('zh');
   const [method, setMethod] = useState<DivinationMethod | null>(null);
   const [hexagram, setHexagram] = useState<HexagramData | null>(null);
   const [lotNumber, setLotNumber] = useState<number | null>(null); // For Guan Yin
@@ -60,11 +62,11 @@ function App() {
     } else if (method === DivinationMethod.TAROT && tarotCards) {
       result = await interpretTarot(tarotCards, question);
     } else if (method === DivinationMethod.BAZI && birthData) {
-      result = await interpretBazi(birthData, question);
+      result = await interpretBazi(birthData, question, lang);
     } else if (method === DivinationMethod.VEDIC && birthData) {
-      result = await interpretVedic(birthData, question);
+      result = await interpretVedic(birthData, question, lang);
     } else if (hexagram) {
-      result = await interpretHexagram(hexagram, question);
+      result = await interpretHexagram(hexagram, question, lang);
     }
 
     setInterpretation(result);
@@ -121,13 +123,24 @@ function App() {
     return '';
   };
 
+  const t = TRANSLATIONS[lang];
+
   return (
     <div className="min-h-screen bg-[#0f172a] bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] text-slate-200 flex flex-col font-sans selection:bg-amber-500/30">
 
       {/* Header */}
-      <header className="p-6 text-center border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 shadow-lg">
+      <header className="p-6 text-center border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 shadow-lg relative">
+        <button
+          onClick={() => setLang(l => l === 'zh' ? 'en' : 'zh')}
+          className="absolute right-4 top-4 p-2 text-slate-400 hover:text-amber-400 transition-colors rounded-full hover:bg-slate-800 border border-transparent hover:border-slate-700"
+          title={lang === 'zh' ? "Switch to English" : "切换为中文"}
+        >
+          <Languages size={20} />
+          <span className="absolute -bottom-4 right-0 text-[10px] w-full text-center font-bold tracking-widest">{lang.toUpperCase()}</span>
+        </button>
+
         <h1 className="text-3xl md:text-4xl font-cinzel font-bold bg-gradient-to-r from-amber-200 via-amber-500 to-amber-200 bg-clip-text text-transparent drop-shadow-sm tracking-wider">
-          天机占卜
+          {t.title}
         </h1>
         <nav className="flex justify-center flex-wrap gap-x-3 gap-y-2 mt-3 text-slate-400 text-xs md:text-sm tracking-widest uppercase opacity-90">
           {[
@@ -272,14 +285,14 @@ function App() {
               <div className={`bg-slate-800/50 p-6 rounded-xl border flex flex-col items-center shadow-lg backdrop-blur-md ${isTarot ? 'border-purple-500/30' : isVedic ? 'border-indigo-500/30' : 'border-slate-700'}`}>
                 <div className="flex items-center justify-between w-full mb-6 border-b border-slate-700 pb-4">
                   <h3 className={`text-xl font-cinzel font-bold ${isTarot ? 'text-purple-400' : isVedic ? 'text-indigo-400' : 'text-amber-400'}`}>
-                    {isGuanYin ? '灵签已出' : isTarot ? '圣三角牌阵' : isBazi ? '生辰信息' : isVedic ? '星盘信息' : '卦象全貌'}
+                    {isGuanYin ? t.results.lotTitle : isTarot ? t.results.tarotTitle : isBazi ? t.results.baziTitle : isVedic ? t.results.vedicTitle : t.results.guaTitle}
                   </h3>
                   <div className="flex gap-2">
-                    <button onClick={resetAll} className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors bg-slate-700/50 px-2 py-1.5 rounded hover:bg-slate-600" title="返回主页">
+                    <button onClick={resetAll} className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors bg-slate-700/50 px-2 py-1.5 rounded hover:bg-slate-600" title={t.actions.home}>
                       <Home size={12} />
                     </button>
                     <button onClick={resetDivination} className="text-xs text-slate-400 hover:text-white flex items-center gap-1 transition-colors bg-slate-700/50 px-3 py-1.5 rounded hover:bg-slate-600">
-                      <RotateCcw size={12} /> {isBazi || isVedic ? '重新输入' : '重新占卜'}
+                      <RotateCcw size={12} /> {isBazi || isVedic ? t.actions.reinput : t.actions.reset}
                     </button>
                   </div>
                 </div>
