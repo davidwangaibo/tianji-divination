@@ -17,7 +17,7 @@ const getGenAI = (customKey?: string) => {
   return new GoogleGenAI({ apiKey });
 };
 
-const MODEL = "gemini-2.0-flash-thinking-exp";
+const MODEL = "gemini-1.5-flash";
 
 export const interpretHexagram = async (
   hexagram: HexagramData,
