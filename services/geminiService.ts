@@ -4,7 +4,7 @@ import { getHexagramInfo, getTransformedHexagram, hasMovingLines, toChineseNum }
 
 const getGenAI = (customKey?: string) => {
   // @ts-ignore
-  const apiKey = customKey || localStorage.getItem('user_api_key') || import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_API_KEY;
+  const apiKey = customKey || localStorage.getItem('user_api_key') || import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_API_KEY || "AIzaSyBcj_3n2XzjIvPvMGQnEpHQq2gzVnh2wF0";
   if (!apiKey) {
     throw new Error('API Key not found');
   }
