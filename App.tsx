@@ -11,15 +11,8 @@ import { getTransformedHexagram, hasMovingLines, toChineseNum } from './utils/ic
 import { Sparkles, Moon, Sun, ArrowRight, BookOpen, RotateCcw, Archive, Star, Home, Calendar, Flower, Languages } from 'lucide-react';
 import { TRANSLATIONS } from './src/constants/translations';
 
-function App() {
-  const [lang, setLang] = useState<Language>(() => {
-    const saved = localStorage.getItem('tianji_lang');
-    return (saved === 'zh' || saved === 'en') ? saved : 'zh';
-  });
-
-  useEffect(() => {
-    localStorage.setItem('tianji_lang', lang);
-  }, [lang]);
+export default function App() {
+  const [lang, setLang] = useState<Language>('zh');
 
   const [method, setMethod] = useState<DivinationMethod | null>(null);
   const [hexagram, setHexagram] = useState<HexagramData | null>(null);
@@ -350,11 +343,11 @@ function App() {
                         </div>
                         <div>
                           <div className="text-xs text-purple-400 uppercase tracking-widest font-bold">
-                            {card.position === 'past' ? '过去' : card.position === 'present' ? '现在' : '未来'}
+                            {t.nav.tarot} - {card.position === 'past' ? (lang === 'zh' ? '过去' : 'Past') : card.position === 'present' ? (lang === 'zh' ? '现在' : 'Present') : (lang === 'zh' ? '未来' : 'Future')}
                           </div>
                           <div className="text-slate-200 font-bold flex items-center gap-2">
                             {card.name}
-                            {card.isReversed && <span className="text-[10px] bg-red-900/50 text-red-200 px-1 rounded">逆</span>}
+                            {card.isReversed && <span className="text-[10px] bg-red-900/50 text-red-200 px-1 rounded">{lang === 'zh' ? '逆' : 'Rev'}</span>}
                           </div>
                           <div className="text-xs text-slate-500 font-serif italic">{card.nameEn}</div>
                         </div>
@@ -367,31 +360,31 @@ function App() {
                   <div className="w-full flex flex-col items-center space-y-4 animate-fade-in-up">
                     <div className={`p-4 border rounded-lg w-full ${isVedic ? 'bg-indigo-900/20 border-indigo-600/30' : 'bg-amber-900/20 border-amber-600/30'}`}>
                       <h4 className={`text-sm font-bold uppercase mb-2 text-center ${isVedic ? 'text-indigo-400' : 'text-amber-400'}`}>
-                        {isVedic ? '星盘数据 (Chart Details)' : '命主信息'}
+                        {isVedic ? t.results.vedicTitle : t.results.baziTitle}
                       </h4>
                       <div className="grid grid-cols-2 gap-4 text-sm text-slate-300">
                         <div className="flex flex-col items-center">
-                          <span className="text-slate-500 text-xs">公历日期</span>
+                          <span className="text-slate-500 text-xs">{t.birthInput.date}</span>
                           <span className="font-mono">{birthData.date}</span>
                         </div>
                         <div className="flex flex-col items-center">
-                          <span className="text-slate-500 text-xs">出生时间</span>
+                          <span className="text-slate-500 text-xs">{t.birthInput.time}</span>
                           <span className="font-mono">{birthData.time}</span>
                         </div>
                         <div className="flex flex-col items-center col-span-2">
-                          <span className="text-slate-500 text-xs">性别</span>
-                          <span>{birthData.gender === 'male' ? '男' : '女'}</span>
+                          <span className="text-slate-500 text-xs">{t.birthInput.gender}</span>
+                          <span>{birthData.gender === 'male' ? t.birthInput.male : t.birthInput.female}</span>
                         </div>
                         {birthData.location && (
                           <div className="flex flex-col items-center col-span-2">
-                            <span className="text-slate-500 text-xs">出生地点</span>
+                            <span className="text-slate-500 text-xs">{t.birthInput.location}</span>
                             <span>{birthData.location}</span>
                           </div>
                         )}
                       </div>
                     </div>
                     <p className="text-xs text-slate-500 text-center">
-                      {isVedic ? 'AI 将采用恒星黄道 (Sidereal/Nirayana) 进行排盘。' : 'AI 将自动为您排盘（年、月、日、时四柱）并推演大运。'}
+                      {isVedic ? (lang === 'zh' ? 'AI 将采用恒星黄道 (Sidereal/Nirayana) 进行排盘。' : 'AI uses Sidereal Zodiac (Nirayana) for charting.') : (lang === 'zh' ? 'AI 将自动为您排盘（年、月、日、时四柱）并推演大运。' : 'AI calculates 4 Pillars of Destiny automatically.')}
                     </p>
                   </div>
                 )}
@@ -404,7 +397,7 @@ function App() {
               {/* Instructions if not yet interpreted */}
               {!interpretation && isHexagramMethod && (
                 <div className="bg-amber-900/10 border border-amber-900/30 p-4 rounded-lg text-sm text-amber-200/70">
-                  <p>提示：本卦代表事物开始或当前的状态，之卦（变卦）代表事物发展的结果或趋势。解卦时需结合两者综判。</p>
+                  <p>{lang === 'zh' ? '提示：本卦代表事物开始或当前的状态，之卦（变卦）代表事物发展的结果或趋势。解卦时需结合两者综判。' : 'Tip: The Hexagram represents the current state. The Transformed Hexagram represents the trend. Interpret both for insight.'}</p>
                 </div>
               )}
             </div>
@@ -415,21 +408,21 @@ function App() {
                 <div className={`bg-slate-800 p-6 rounded-xl border shadow-xl h-full flex flex-col ${isTarot ? 'border-purple-500/30' : isVedic ? 'border-indigo-500/30' : 'border-slate-700'}`}>
                   <h3 className="text-xl font-bold text-slate-200 mb-6 flex items-center gap-2">
                     <Sparkles className={isTarot ? "text-purple-500" : isVedic ? 'text-indigo-400' : "text-amber-500"} size={20} />
-                    {isGuanYin ? '祈求解签' : isTarot ? '冥想问题' : (isBazi || isVedic) ? '重点关注' : '诚心叩问'}
+                    {isGuanYin ? t.methods.guanyin.title : isTarot ? t.methods.tarot.title : (isBazi || isVedic) ? t.input.questionLabelSpecific : t.actions.submit}
                   </h3>
 
                   <div className="flex-grow flex flex-col gap-4">
                     <div>
                       <label className="block text-slate-400 text-xs uppercase tracking-wider mb-2 font-bold">
-                        {isGuanYin ? '弟子所求何事？' : (isBazi || isVedic) ? '您最想了解哪方面？(可选)' : '您想问什么？'}
+                        {isGuanYin ? (lang === 'zh' ? '弟子所求何事？' : 'What is your prayer?') : (isBazi || isVedic) ? t.input.questionLabelSpecific : t.input.questionLabel}
                       </label>
                       <textarea
                         value={question}
                         onChange={(e) => setQuestion(e.target.value)}
                         placeholder={
                           isTarot ? "请集中精神，描述您想询问的关于感情、事业或生活的具体困惑..." :
-                            (isBazi || isVedic) ? "如需了解特定年份或事件（如：2026年运势、婚姻、转行），请在此备注..." :
-                              "请具体描述您的困惑..."
+                            (isBazi || isVedic) ? t.input.questionPlaceholderBazi :
+                              t.input.questionPlaceholder
                         }
                         className={`w-full h-40 bg-slate-900/80 border rounded-lg p-4 text-slate-200 focus:ring-2 focus:border-transparent focus:outline-none resize-none leading-relaxed placeholder:text-slate-600 ${isTarot ? 'border-purple-500/30 focus:ring-purple-500' : isVedic ? 'border-indigo-500/30 focus:ring-indigo-500' : 'border-slate-600 focus:ring-amber-500'}`}
                       />
@@ -444,7 +437,7 @@ function App() {
                       {loading ? (
                         <>
                           <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
-                          <span className="animate-pulse">正在沟通{isTarot ? '潜意识' : '天机'}...</span>
+                          <span className="animate-pulse">{isTarot ? t.actions.analyzingTarot : t.actions.analyzing}</span>
                         </>
                       ) : (
                         <>
@@ -506,5 +499,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
