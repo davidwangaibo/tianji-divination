@@ -12,7 +12,15 @@ import { Sparkles, Moon, Sun, ArrowRight, BookOpen, RotateCcw, Archive, Star, Ho
 import { TRANSLATIONS } from './src/constants/translations';
 
 function App() {
-  const [lang, setLang] = useState<Language>('zh');
+  const [lang, setLang] = useState<Language>(() => {
+    const saved = localStorage.getItem('tianji_lang');
+    return (saved === 'zh' || saved === 'en') ? saved : 'zh';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('tianji_lang', lang);
+  }, [lang]);
+
   const [method, setMethod] = useState<DivinationMethod | null>(null);
   const [hexagram, setHexagram] = useState<HexagramData | null>(null);
   const [lotNumber, setLotNumber] = useState<number | null>(null); // For Guan Yin
@@ -114,12 +122,13 @@ function App() {
   const hasResult = hexagram || lotNumber || tarotCards || birthData;
 
   const getMethodName = () => {
-    if (method === DivinationMethod.COIN) return '六爻起卦';
-    if (method === DivinationMethod.TIME) return '梅花易数';
-    if (method === DivinationMethod.GUAN_YIN) return '观音灵签';
-    if (method === DivinationMethod.TAROT) return '塔罗占卜';
-    if (method === DivinationMethod.BAZI) return '八字详批';
-    if (method === DivinationMethod.VEDIC) return '印度占星';
+    const t = TRANSLATIONS[lang];
+    if (method === DivinationMethod.COIN) return t.methods.coin.title;
+    if (method === DivinationMethod.TIME) return t.methods.time.title;
+    if (method === DivinationMethod.GUAN_YIN) return t.methods.guanyin.title;
+    if (method === DivinationMethod.TAROT) return t.methods.tarot.title;
+    if (method === DivinationMethod.BAZI) return t.methods.bazi.title;
+    if (method === DivinationMethod.VEDIC) return t.methods.vedic.title;
     return '';
   };
 
@@ -144,12 +153,12 @@ function App() {
         </h1>
         <nav className="flex justify-center flex-wrap gap-x-3 gap-y-2 mt-3 text-slate-400 text-xs md:text-sm tracking-widest uppercase opacity-90">
           {[
-            { name: '易经', method: DivinationMethod.COIN },
-            { name: '梅花', method: DivinationMethod.TIME },
-            { name: '八字', method: DivinationMethod.BAZI },
-            { name: '塔罗', method: DivinationMethod.TAROT },
-            { name: '灵签', method: DivinationMethod.GUAN_YIN },
-            { name: '印度占星', method: DivinationMethod.VEDIC },
+            { name: t.nav.coin, method: DivinationMethod.COIN },
+            { name: t.nav.time, method: DivinationMethod.TIME },
+            { name: t.nav.bazi, method: DivinationMethod.BAZI },
+            { name: t.nav.tarot, method: DivinationMethod.TAROT },
+            { name: t.nav.guanyin, method: DivinationMethod.GUAN_YIN },
+            { name: t.nav.vedic, method: DivinationMethod.VEDIC },
           ].map((item, index) => (
             <React.Fragment key={item.name}>
               {index > 0 && <span className="opacity-30 select-none">•</span>}
@@ -177,9 +186,9 @@ function App() {
               <div className="absolute top-4 right-4 text-slate-600 group-hover:text-amber-500 transition-colors">
                 <Sun size={24} />
               </div>
-              <h2 className="text-lg font-bold text-slate-100 mb-2 group-hover:text-amber-400 font-cinzel">铜钱起卦</h2>
+              <h2 className="text-lg font-bold text-slate-100 mb-2 group-hover:text-amber-400 font-cinzel">{t.methods.coin.title}</h2>
               <p className="text-slate-400 leading-relaxed text-xs">
-                手掷三枚铜钱，捕捉细微灵机。适合具体运势判断。
+                {t.methods.coin.desc}
               </p>
             </button>
 
@@ -190,9 +199,9 @@ function App() {
               <div className="absolute top-4 right-4 text-slate-600 group-hover:text-indigo-500 transition-colors">
                 <Moon size={24} />
               </div>
-              <h2 className="text-lg font-bold text-slate-100 mb-2 group-hover:text-indigo-400 font-cinzel">梅花易数</h2>
+              <h2 className="text-lg font-bold text-slate-100 mb-2 group-hover:text-indigo-400 font-cinzel">{t.methods.time.title}</h2>
               <p className="text-slate-400 leading-relaxed text-xs">
-                取此刻天地之数，洞察先机。适合突发事件决策。
+                {t.methods.time.desc}
               </p>
             </button>
 
@@ -203,9 +212,9 @@ function App() {
               <div className="absolute top-4 right-4 text-slate-600 group-hover:text-amber-600 transition-colors">
                 <Calendar size={24} />
               </div>
-              <h2 className="text-lg font-bold text-slate-100 mb-2 group-hover:text-amber-500 font-cinzel">八字详批</h2>
+              <h2 className="text-lg font-bold text-slate-100 mb-2 group-hover:text-amber-500 font-cinzel">{t.methods.bazi.title}</h2>
               <p className="text-slate-400 leading-relaxed text-xs">
-                输入生辰八字，推演一生命运、事业财运与流年。
+                {t.methods.bazi.desc}
               </p>
             </button>
 
@@ -216,9 +225,9 @@ function App() {
               <div className="absolute top-4 right-4 text-slate-600 group-hover:text-red-500 transition-colors">
                 <Archive size={24} />
               </div>
-              <h2 className="text-lg font-bold text-slate-100 mb-2 group-hover:text-red-400 font-cinzel">观音灵签</h2>
+              <h2 className="text-lg font-bold text-slate-100 mb-2 group-hover:text-red-400 font-cinzel">{t.methods.guanyin.title}</h2>
               <p className="text-slate-400 leading-relaxed text-xs">
-                诚心摇动签筒，求得菩萨指引，指点迷津。
+                {t.methods.guanyin.desc}
               </p>
             </button>
 
@@ -229,9 +238,9 @@ function App() {
               <div className="absolute top-4 right-4 text-slate-600 group-hover:text-purple-500 transition-colors">
                 <Star size={24} />
               </div>
-              <h2 className="text-lg font-bold text-slate-100 mb-2 group-hover:text-purple-400 font-cinzel">塔罗占卜</h2>
+              <h2 className="text-lg font-bold text-slate-100 mb-2 group-hover:text-purple-400 font-cinzel">{t.methods.tarot.title}</h2>
               <p className="text-slate-400 leading-relaxed text-xs">
-                西方神秘学智慧，通过牌阵解析潜意识与未来趋势。
+                {t.methods.tarot.desc}
               </p>
             </button>
 
@@ -242,9 +251,9 @@ function App() {
               <div className="absolute top-4 right-4 text-slate-600 group-hover:text-indigo-400 transition-colors">
                 <Flower size={24} />
               </div>
-              <h2 className="text-lg font-bold text-slate-100 mb-2 group-hover:text-indigo-300 font-cinzel">印度占星</h2>
+              <h2 className="text-lg font-bold text-slate-100 mb-2 group-hover:text-indigo-300 font-cinzel">{t.methods.vedic.title}</h2>
               <p className="text-slate-400 leading-relaxed text-xs">
-                Vedic Astrology (Jyotish)，基于恒星黄道排盘，精准预测大运与宿命。
+                {t.methods.vedic.desc}
               </p>
             </button>
           </div>
@@ -255,7 +264,7 @@ function App() {
           <div className="mt-8 animate-fade-in">
             <div className="mb-6 flex items-center justify-between">
               <button onClick={() => setMethod(null)} className="text-slate-400 hover:text-white flex items-center gap-2 text-sm transition-colors">
-                &larr; 返回选择
+                &larr; {t.actions.back}
               </button>
               <span className={`font-bold uppercase tracking-wider text-xs border px-3 py-1 rounded-full ${isTarot ? 'text-purple-400 border-purple-500/30' : isVedic ? 'text-indigo-400 border-indigo-500/30' : 'text-amber-500/80 border-amber-500/30'}`}>
                 当前模式: {getMethodName()}
