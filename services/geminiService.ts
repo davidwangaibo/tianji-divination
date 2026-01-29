@@ -8,6 +8,12 @@ const getGenAI = (customKey?: string) => {
   if (!apiKey) {
     throw new Error('API Key not found');
   }
+
+  const baseUrl = localStorage.getItem('user_base_url');
+  if (baseUrl) {
+    return new GoogleGenAI({ apiKey, baseURL: baseUrl });
+  }
+
   return new GoogleGenAI({ apiKey });
 };
 
@@ -138,7 +144,7 @@ export const interpretHexagram = async (
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     if (error.message === 'API Key not found') return lang === 'zh' ? "请在设置中配置 API Key。" : "Please configure API Key in settings.";
-    return lang === 'zh' ? "连接神谕时发生错误，请检查网络后重试。" : "Error connecting to the Oracle. Please check your network.";
+    return lang === 'zh' ? `连接错误: ${error.message}` : `Connection Error: ${error.message}`;
   }
 };
 
@@ -248,7 +254,7 @@ export const interpretGuanYin = async (
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     if (error.message === 'API Key not found') return lang === 'zh' ? "请配置 API Key。" : "Please configure API Key.";
-    return lang === 'zh' ? "连接神谕时发生错误，请检查网络。" : "Error connecting to the divine. Please check network.";
+    return lang === 'zh' ? `连接错误: ${error.message}` : `Connection Error: ${error.message}`;
   }
 };
 
@@ -364,7 +370,7 @@ export const interpretTarot = async (
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     if (error.message === 'API Key not found') return lang === 'zh' ? "请配置 API Key。" : "Please configure API Key.";
-    return lang === 'zh' ? "连接宇宙能量时发生中断，请检查网络。" : "Connection to cosmic energy interrupted.";
+    return lang === 'zh' ? `连接错误: ${error.message}` : `Connection Error: ${error.message}`;
   }
 };
 
@@ -489,7 +495,7 @@ export const interpretBazi = async (
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     if (error.message === 'API Key not found') return lang === 'zh' ? "请配置 API Key。" : "Please configure API Key.";
-    return lang === 'zh' ? "连接命运齿轮时发生错误，请检查网络。" : "Error connecting to the gears of destiny.";
+    return lang === 'zh' ? `连接错误: ${error.message}` : `Connection Error: ${error.message}`;
   }
 };
 
@@ -609,6 +615,6 @@ export const interpretVedic = async (
   } catch (error: any) {
     console.error("Gemini API Error:", error);
     if (error.message === 'API Key not found') return lang === 'zh' ? "请配置 API Key。" : "Please configure API Key.";
-    return lang === 'zh' ? "连接宇宙能量场时发生中断，请检查网络。" : "Connection to universal energy interrupted.";
+    return lang === 'zh' ? `连接错误: ${error.message}` : `Connection Error: ${error.message}`;
   }
 };
