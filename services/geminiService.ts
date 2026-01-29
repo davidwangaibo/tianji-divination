@@ -17,7 +17,9 @@ const getGenAI = (customKey?: string) => {
   return new GoogleGenAI({ apiKey });
 };
 
-const MODEL = "gemini-1.5-flash";
+const getModel = () => {
+  return localStorage.getItem('user_model') || "gemini-1.5-flash";
+};
 
 export const interpretHexagram = async (
   hexagram: HexagramData,
@@ -136,9 +138,8 @@ export const interpretHexagram = async (
     }
 
     const response = await ai.models.generateContent({
-      model: MODEL,
+      model: getModel(),
       contents: prompt,
-      config: { thinkingConfig: { thinkingBudget: 0 } }
     });
     return response.text || (lang === 'zh' ? "云深不知处，天机暂未明。请稍后再试。" : "The clouds are thick, the oracle is silent. Please try again later.");
   } catch (error: any) {
@@ -246,9 +247,8 @@ export const interpretGuanYin = async (
   try {
     const ai = getGenAI();
     const response = await ai.models.generateContent({
-      model: MODEL,
+      model: getModel(),
       contents: prompt,
-      config: { thinkingConfig: { thinkingBudget: 0 } }
     });
     return response.text || (lang === 'zh' ? "佛光隐现，请稍后再试。" : "The Buddha's light is faint, please try again.");
   } catch (error: any) {
@@ -362,9 +362,8 @@ export const interpretTarot = async (
   try {
     const ai = getGenAI();
     const response = await ai.models.generateContent({
-      model: MODEL,
+      model: getModel(),
       contents: prompt,
-      config: { thinkingConfig: { thinkingBudget: 0 } }
     });
     return response.text || (lang === 'zh' ? "水晶球迷雾重重，请稍后再试。" : "The crystal ball is misty, please try again.");
   } catch (error: any) {
@@ -487,9 +486,8 @@ export const interpretBazi = async (
   try {
     const ai = getGenAI();
     const response = await ai.models.generateContent({
-      model: MODEL,
+      model: getModel(),
       contents: prompt,
-      config: { thinkingConfig: { thinkingBudget: 0 } }
     });
     return response.text || (lang === 'zh' ? "天干地支运转繁复，暂未算出结果，请稍后再试。" : "The celestial stems turn complexly, please try again.");
   } catch (error: any) {
@@ -607,9 +605,8 @@ export const interpretVedic = async (
   try {
     const ai = getGenAI();
     const response = await ai.models.generateContent({
-      model: MODEL,
+      model: getModel(),
       contents: prompt,
-      config: { thinkingConfig: { thinkingBudget: 0 } }
     });
     return response.text || (lang === 'zh' ? "星海浩渺，云雾遮眼，请稍后再试。" : "The stars are vast and veiled, please try again.");
   } catch (error: any) {

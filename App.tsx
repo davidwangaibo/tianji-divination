@@ -22,6 +22,26 @@ export default function App() {
   const [tarotCards, setTarotCards] = useState<TarotCard[] | null>(null);
   const [birthData, setBirthData] = useState<BirthData | null>(null);
 
+  useEffect(() => {
+    // Check for settings in URL (Sync from QR Code)
+    const params = new URLSearchParams(window.location.search);
+    const key = params.get('settings_key');
+    const url = params.get('settings_url');
+    const model = params.get('settings_model');
+
+    if (key || url || model) {
+      if (key) localStorage.setItem('user_api_key', key);
+      if (url) localStorage.setItem('user_base_url', url);
+      if (model) localStorage.setItem('user_model', model);
+
+      // Clean URL
+      const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+      window.history.pushState({ path: newUrl }, '', newUrl);
+
+      alert(lang === 'zh' ? "配置已同步！" : "Configuration Synced!");
+    }
+  }, []);
+
   const [question, setQuestion] = useState('');
   const [interpretation, setInterpretation] = useState('');
   const [loading, setLoading] = useState(false);
