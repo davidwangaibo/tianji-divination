@@ -10,7 +10,7 @@ interface ApiKeyModalProps {
 export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, lang }) => {
     const [apiKey, setApiKey] = useState('');
     const [baseUrl, setBaseUrl] = useState('');
-    const [model, setModel] = useState('gemini-1.5-flash');
+    const [model, setModel] = useState('gemini-2.5-flash');
     const [showQr, setShowQr] = useState(false);
 
     useEffect(() => {
@@ -100,8 +100,8 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, lang 
                             <AlertCircle className="text-blue-400 shrink-0 mt-0.5" size={18} />
                             <p className="text-sm text-blue-200/80 leading-relaxed">
                                 {lang === 'zh'
-                                    ? '请输入 Gemini API Key。如果不确定模型兼容性，请选择 "gemini-1.5-flash"。'
-                                    : 'Enter your Gemini API Key. Use "gemini-1.5-flash" for best compatibility.'}
+                                    ? '请输入 Gemini API Key。如果不确定模型兼容性，请选择 "gemini-2.5-flash"。'
+                                    : 'Enter your Gemini API Key. Use "gemini-2.5-flash" for best compatibility.'}
                             </p>
                         </div>
 
@@ -128,9 +128,9 @@ export const ApiKeyModal: React.FC<ApiKeyModalProps> = ({ isOpen, onClose, lang 
                                     onChange={(e) => setModel(e.target.value)}
                                     className="w-full bg-slate-950/50 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all font-mono text-sm"
                                 >
-                                    <option value="gemini-1.5-flash">gemini-1.5-flash (推荐/Recommended)</option>
-                                    <option value="gemini-1.5-pro">gemini-1.5-pro (专业/Pro)</option>
-                                    <option value="gemini-2.0-flash-exp">gemini-2.0-flash-exp (实验/Experimental)</option>
+                                    <option value="gemini-2.5-flash">gemini-2.5-flash (推荐/Recommended)</option>
+                                    <option value="gemini-2.5-pro">gemini-2.5-pro (专业/Pro)</option>
+                                    <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (高效/Efficient)</option>
                                 </select>
                             </div>
 
