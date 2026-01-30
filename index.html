@@ -41,11 +41,33 @@
       font-family: 'Cinzel', serif;
     }
   </style>
-  <script type="module" crossorigin src="/tianji-divination/assets/index-DifhwNng.js"></script>
+  <script type="module" crossorigin src="/tianji-divination/assets/index-CUJTEssW.js?v=1769808478123"></script>
+
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="version" content="1769808478123">
 </head>
 
 <body>
   <div id="root"></div>
+
+    <script>
+        (function() {
+            const currentVersion = '1769808478123';
+            const storedVersion = localStorage.getItem('app_version');
+            
+            if (storedVersion && storedVersion !== currentVersion) {
+                console.log('🔄 检测到新版本，正在清除缓存...');
+                localStorage.clear();
+                sessionStorage.clear();
+                localStorage.setItem('app_version', currentVersion);
+                // 不需要重新加载，因为这是首次加载
+            } else {
+                localStorage.setItem('app_version', currentVersion);
+            }
+        })();
+    </script>
 </body>
 
 </html>
