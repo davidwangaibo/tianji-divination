@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>清除缓存 - 天机占卜</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            text-align: center;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .status {
+            font-size: 48px;
+            margin: 20px 0;
+        }
+        .message {
+            font-size: 18px;
+            color: #555;
+            margin: 20px 0;
+            line-height: 1.6;
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: transform 0.3s;
+        }
+        .button:hover {
+            transform: scale(1.05);
+        }
+        .timer {
+            font-size: 14px;
+            color: #999;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 正在清除缓存...</h1>
+        <div class="status" id="status">⏳</div>
+        <div class="message" id="message">请稍候，正在清除旧的配置...</div>
+        <div class="timer" id="timer"></div>
+        <a href="https://davidwangaibo.github.io/tianji-divination/" class="button" id="redirectBtn" style="display:none;">
+            前往天机占卜 →
+        </a>
+    </div>
+
+    <script>
+        // 清除所有localStorage数据
+        localStorage.clear();
+        
+        // 设置正确的模型
+        localStorage.setItem('user_model', 'gemini-2.5-flash');
+        
+        // 清除sessionStorage
+        sessionStorage.clear();
+        
+        // 更新状态
+        setTimeout(() => {
+            document.getElementById('status').textContent = '✅';
+            document.getElementById('message').innerHTML = `
+                <strong>缓存已清除！</strong><br><br>
+                已设置默认模型为 <strong>gemini-2.5-flash</strong><br>
+                3秒后自动跳转...
+            `;
+            
+            // 倒计时
+            let countdown = 3;
+            const timerEl = document.getElementById('timer');
+            const interval = setInterval(() => {
+                countdown--;
+                timerEl.textContent = `${countdown} 秒后自动跳转到应用...`;
+                
+                if (countdown <= 0) {
+                    clearInterval(interval);
+                    // 跳转到应用
+                    window.location.href = 'https://davidwangaibo.github.io/tianji-divination/';
+                }
+            }, 1000);
+            
+            // 显示手动跳转按钮
+            document.getElementById('redirectBtn').style.display = 'inline-block';
+        }, 1000);
+    </script>
+</body>
+</html>
