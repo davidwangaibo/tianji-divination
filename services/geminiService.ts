@@ -1,19 +1,45 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { HexagramData, TarotCard, BirthData, Language } from "../types";
 import { getHexagramInfo, getTransformedHexagram, hasMovingLines, toChineseNum } from "../utils/iching";
 
-const getGenAI = (customKey?: string) => {
-  // @ts-ignore
-  const apiKey = customKey || localStorage.getItem('user_api_key') || import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_API_KEY || "AIzaSyBcj_3n2XzjIvPvMGQnEpHQq2gzVnh2wF0";
-  if (!apiKey) {
-    throw new Error('API Key not found');
+// ========================================
+// Cloudflare Worker 代理配置
+// API Keys 现在完全隐藏在后端!
+// ========================================
+const PROXY_URL = "https://tianji-gemini-proxy.workers.dev";
+const HARDCODED_MODEL = "gemini-1.5-flash";
+
+// 调用 Cloudflare Worker 代理
+const callGeminiViaProxy = async (prompt: string, model: string = HARDCODED_MODEL): Promise<string> => {
+  try {
+    const response = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        prompt,
+        model,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Proxy error:', errorText);
+      throw new Error(`Proxy returned ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+
+    // 解析 Gemini API 响应格式
+    if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+      return data.candidates[0].content.parts[0].text;
+    }
+
+    throw new Error('Invalid response format from Gemini API');
+  } catch (error: any) {
+    console.error('Failed to call Gemini via proxy:', error);
+    throw error;
   }
-
-  return new GoogleGenerativeAI(apiKey);
-};
-
-const getModel = () => {
-  return localStorage.getItem('user_model') || "gemini-2.5-flash";
 };
 
 export const interpretHexagram = async (
@@ -22,8 +48,6 @@ export const interpretHexagram = async (
   lang: Language = 'zh'
 ): Promise<string> => {
   try {
-    const ai = getGenAI();
-
     // Basic Info
     const originalInfo = getHexagramInfo(hexagram.lines);
     const transformedLines = getTransformedHexagram(hexagram.lines);
@@ -132,12 +156,9 @@ export const interpretHexagram = async (
     `;
     }
 
-    const model = ai.getGenerativeModel({ model: getModel() });
-    const response = await model.generateContent(prompt);
-    return response.response.text() || (lang === 'zh' ? "云深不知处，天机暂未明。请稍后再试。" : "The clouds are thick, the oracle is silent. Please try again later.");
+    return await callGeminiViaProxy(prompt);
   } catch (error: any) {
     console.error("Gemini API Error:", error);
-    if (error.message === 'API Key not found') return lang === 'zh' ? "请在设置中配置 API Key。" : "Please configure API Key in settings.";
     return lang === 'zh' ? `连接错误: ${error.message}` : `Connection Error: ${error.message}`;
   }
 };
@@ -238,13 +259,9 @@ export const interpretGuanYin = async (
   }
 
   try {
-    const ai = getGenAI();
-    const model = ai.getGenerativeModel({ model: getModel() });
-    const response = await model.generateContent(prompt);
-    return response.response.text() || (lang === 'zh' ? "佛光隐现，请稍后再试。" : "The Buddha's light is faint, please try again.");
+    return await callGeminiViaProxy(prompt);
   } catch (error: any) {
     console.error("Gemini API Error:", error);
-    if (error.message === 'API Key not found') return lang === 'zh' ? "请配置 API Key。" : "Please configure API Key.";
     return lang === 'zh' ? `连接错误: ${error.message}` : `Connection Error: ${error.message}`;
   }
 };
@@ -351,13 +368,9 @@ export const interpretTarot = async (
   }
 
   try {
-    const ai = getGenAI();
-    const model = ai.getGenerativeModel({ model: getModel() });
-    const response = await model.generateContent(prompt);
-    return response.response.text() || (lang === 'zh' ? "水晶球迷雾重重，请稍后再试。" : "The crystal ball is misty, please try again.");
+    return await callGeminiViaProxy(prompt);
   } catch (error: any) {
     console.error("Gemini API Error:", error);
-    if (error.message === 'API Key not found') return lang === 'zh' ? "请配置 API Key。" : "Please configure API Key.";
     return lang === 'zh' ? `连接错误: ${error.message}` : `Connection Error: ${error.message}`;
   }
 };
@@ -473,13 +486,9 @@ export const interpretBazi = async (
   }
 
   try {
-    const ai = getGenAI();
-    const model = ai.getGenerativeModel({ model: getModel() });
-    const response = await model.generateContent(prompt);
-    return response.response.text() || (lang === 'zh' ? "天干地支运转繁复，暂未算出结果，请稍后再试。" : "The celestial stems turn complexly, please try again.");
+    return await callGeminiViaProxy(prompt);
   } catch (error: any) {
     console.error("Gemini API Error:", error);
-    if (error.message === 'API Key not found') return lang === 'zh' ? "请配置 API Key。" : "Please configure API Key.";
     return lang === 'zh' ? `连接错误: ${error.message}` : `Connection Error: ${error.message}`;
   }
 };
@@ -590,13 +599,9 @@ export const interpretVedic = async (
   }
 
   try {
-    const ai = getGenAI();
-    const model = ai.getGenerativeModel({ model: getModel() });
-    const response = await model.generateContent(prompt);
-    return response.response.text() || (lang === 'zh' ? "星海浩渺，云雾遮眼，请稍后再试。" : "The stars are vast and veiled, please try again.");
+    return await callGeminiViaProxy(prompt);
   } catch (error: any) {
     console.error("Gemini API Error:", error);
-    if (error.message === 'API Key not found') return lang === 'zh' ? "请配置 API Key。" : "Please configure API Key.";
     return lang === 'zh' ? `连接错误: ${error.message}` : `Connection Error: ${error.message}`;
   }
 };

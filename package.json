@@ -5,12 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node cache-buster.js",
     "preview": "vite preview",
-    "deploy": "vite build && gh-pages -d dist"
+    "deploy": "npm run build && gh-pages -d dist",
+    "clear-cache": "powershell -ExecutionPolicy Bypass -File ./clear-cache.ps1",
+    "redeploy": "npm run clear-cache && npm run deploy"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.22.0",
     "lucide-react": "^0.562.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3"

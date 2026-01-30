@@ -5,16 +5,14 @@ import { GuanYinCian } from './components/GuanYinCian';
 import { HexagramVisual } from './components/HexagramVisual';
 import { TarotDeck } from './components/TarotDeck';
 import { BirthChartInput } from './components/BirthChartInput';
-import { ApiKeyModal } from './components/ApiKeyModal';
 import { interpretHexagram, interpretGuanYin, interpretTarot, interpretBazi, interpretVedic } from './services/geminiService';
 import { DivinationMethod, HexagramData, YaoValue, TarotCard, BirthData, Language } from './types';
 import { getTransformedHexagram, hasMovingLines, toChineseNum } from './utils/iching';
-import { Sparkles, Moon, Sun, ArrowRight, BookOpen, RotateCcw, Archive, Star, Home, Calendar, Flower, Languages, Settings } from 'lucide-react';
+import { Sparkles, Moon, Sun, ArrowRight, BookOpen, RotateCcw, Archive, Star, Home, Calendar, Flower } from 'lucide-react';
 import { TRANSLATIONS } from './src/constants/translations';
 
 export default function App() {
   const [lang, setLang] = useState<Language>('zh');
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   const [method, setMethod] = useState<DivinationMethod | null>(null);
   const [hexagram, setHexagram] = useState<HexagramData | null>(null);
@@ -22,25 +20,7 @@ export default function App() {
   const [tarotCards, setTarotCards] = useState<TarotCard[] | null>(null);
   const [birthData, setBirthData] = useState<BirthData | null>(null);
 
-  useEffect(() => {
-    // Check for settings in URL (Sync from QR Code)
-    const params = new URLSearchParams(window.location.search);
-    const key = params.get('settings_key');
-    const url = params.get('settings_url');
-    const model = params.get('settings_model');
 
-    if (key || url || model) {
-      if (key) localStorage.setItem('user_api_key', key);
-      if (url) localStorage.setItem('user_base_url', url);
-      if (model) localStorage.setItem('user_model', model);
-
-      // Clean URL
-      const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
-      window.history.pushState({ path: newUrl }, '', newUrl);
-
-      alert(lang === 'zh' ? "配置已同步！" : "Configuration Synced!");
-    }
-  }, []);
 
   const [question, setQuestion] = useState('');
   const [interpretation, setInterpretation] = useState('');
@@ -154,15 +134,7 @@ export default function App() {
 
       {/* Header */}
       <header className="p-6 text-center border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 shadow-lg relative">
-        <div className="absolute right-4 top-4 flex items-center gap-3 z-50">
-          <button
-            onClick={() => setIsSettingsOpen(true)}
-            className="p-2 text-slate-400 hover:text-amber-400 transition-colors bg-slate-800/80 rounded-full border border-slate-700/50 backdrop-blur-md shadow-lg hover:border-amber-500/50"
-            title={lang === 'zh' ? "设置 API Key" : "Configure API Key"}
-          >
-            <Settings size={18} />
-          </button>
-
+        <div className="absolute right-4 top-4 z-50">
           <div className="flex items-center bg-slate-800/80 rounded-full p-1 border border-slate-700/50 backdrop-blur-md shadow-lg">
             <button
               onClick={() => setLang('zh')}
@@ -178,8 +150,6 @@ export default function App() {
             </button>
           </div>
         </div>
-
-        <ApiKeyModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} lang={lang} />
 
         <h1 className="text-3xl md:text-4xl font-cinzel font-bold bg-gradient-to-r from-amber-200 via-amber-500 to-amber-200 bg-clip-text text-transparent drop-shadow-sm tracking-wider">
           {t.title}
@@ -536,6 +506,6 @@ export default function App() {
           text-orientation: upright;
         }
       `}</style>
-    </div>
+    </div >
   );
 }
