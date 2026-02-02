@@ -3,11 +3,6 @@ export const config = {
 };
 
 export default async function handler(request) {
-    // Only allow POST requests
-    if (request.method !== 'POST') {
-        return new Response('Method Not Allowed', { status: 405 });
-    }
-
     // CORS Headers
     const corsHeaders = {
         'Access-Control-Allow-Origin': '*',
@@ -18,6 +13,11 @@ export default async function handler(request) {
     // Handle OPTIONS preflight
     if (request.method === 'OPTIONS') {
         return new Response(null, { headers: corsHeaders });
+    }
+
+    // Only allow POST requests
+    if (request.method !== 'POST') {
+        return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
     }
 
     try {
