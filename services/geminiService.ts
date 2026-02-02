@@ -12,7 +12,7 @@ const HARDCODED_MODEL = "gemini-2.5-flash";
 // Helper: Call Gemini Directly
 const callGeminiDirect = async (prompt: string, model: string, apiKey: string): Promise<string> => {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-  
+
   const response = await fetch(url, {
     method: 'POST',
     headers: {
@@ -38,17 +38,20 @@ const callGeminiDirect = async (prompt: string, model: string, apiKey: string): 
 // Main Call Function
 const callGeminiViaProxy = async (prompt: string, model: string = HARDCODED_MODEL): Promise<string> => {
   // 1. Try Direct Call if API Key is available (Preferred for GitHub Pages demo)
-  // Note: In a real production app, you should not expose keys on the client.
-  // But for this personal demo deployed via gh-pages, this is the most reliable method.
-  const apiKey = process.env.GEMINI_API_KEY || (import.meta as any).env?.VITE_GEMINI_API_KEY;
+  const apiKey = (import.meta as any).env.VITE_GEMINI_API_KEY;
+
+  console.log("Tianji Debug: Checking API Key availability...", apiKey ? "Key Found" : "Key Missing");
 
   if (apiKey) {
     try {
+      console.log("Tianji Debug: Attempting Direct API Call...");
       return await callGeminiDirect(prompt, model, apiKey);
     } catch (error: any) {
       console.warn("Direct API call failed, trying proxy...", error);
       // Fallthrough to proxy
     }
+  } else {
+    console.warn("Tianji Debug: No API Key found in environment variables.");
   }
 
   // 2. Fallback to Proxy
@@ -68,7 +71,7 @@ const callGeminiViaProxy = async (prompt: string, model: string = HARDCODED_MODE
       const errorText = await response.text();
       // Check if it's the HTML 404/405 error from Vercel platform
       if (errorText.trim().startsWith('<')) {
-         throw new Error(`Proxy unreachable (Status ${response.status}). Please check Vercel deployment.`);
+        throw new Error(`Proxy unreachable (Status ${response.status}). Please check Vercel deployment.`);
       }
       console.error('Proxy error:', errorText);
       throw new Error(`Proxy returned ${response.status}: ${errorText}`);
