@@ -1,13 +1,14 @@
 {
     "name":  "天机占卜",
     "private":  true,
-    "version":  "0.0.1",
+    "version":  "0.0.2",
     "type":  "module",
     "scripts":  {
                     "dev":  "vite",
                     "build":  "vite build \u0026\u0026 node cache-buster.js",
+                    "build:gh":  "vite build --base=/tianji-divination/ \u0026\u0026 node cache-buster.js",
                     "preview":  "vite preview",
-                    "deploy":  "npm run build \u0026\u0026 gh-pages -d dist",
+                    "deploy":  "npm run build:gh \u0026\u0026 gh-pages -d dist",
                     "clear-cache":  "powershell -ExecutionPolicy Bypass -File ./clear-cache.ps1",
                     "redeploy":  "npm run clear-cache \u0026\u0026 npm run deploy"
                 },

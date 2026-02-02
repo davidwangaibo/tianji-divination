@@ -8,7 +8,9 @@ export default defineConfig(({ mode }) => {
 
   return {
     // Base URL must match the GitHub repository name for Pages deployment
-    base: mode === 'production' ? '/tianji-divination/' : '/',
+    // Base URL defaults to '/' which is correct for Vercel. 
+    // GitHub Pages build will override this via CLI flag --base=/tianji-divination/
+    base: '/',
     server: {
       port: 3000,
       host: '0.0.0.0',
