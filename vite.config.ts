@@ -7,7 +7,8 @@ export default defineConfig(({ mode }) => {
   const isGitHub = process.env.GITHUB_ACTIONS === 'true';
 
   return {
-    base: isGitHub ? '/tianji-divination-new/' : '/',
+    // Base URL must match the GitHub repository name for Pages deployment
+    base: mode === 'production' ? '/tianji-divination/' : '/',
     server: {
       port: 3000,
       host: '0.0.0.0',
