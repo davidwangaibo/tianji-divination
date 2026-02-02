@@ -1,37 +1,29 @@
-// Node.js Runtime (Default)
+// Node.js Runtime (Standard Vercel Serverless Function)
+export default async function handler(req, res) {
+    // 1. CORS Setup - Set headers for ALL responses
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-export default async function handler(request) {
-    // CORS Headers
-    const corsHeaders = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-    };
-
-    // Handle OPTIONS preflight
-    if (request.method === 'OPTIONS') {
-        return new Response(null, { headers: corsHeaders });
+    // 2. Handle OPTIONS preflight immediately
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
     }
 
-    // Only allow POST requests
-    if (request.method !== 'POST') {
-        return new Response('Method Not Allowed', { status: 405, headers: corsHeaders });
+    // 3. Method Check
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method Not Allowed' });
     }
 
     try {
-        const body = await request.json();
-        const { prompt, model = 'gemini-2.5-flash' } = body;
+        // 4. Body Parsing (Vercel automatic for Node.js)
+        const { prompt, model = 'gemini-2.5-flash' } = req.body || {};
 
         if (!prompt) {
-            return new Response(JSON.stringify({ error: 'Prompt is required' }), {
-                status: 400,
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            });
+            return res.status(400).json({ error: 'Prompt is required' });
         }
 
-        // Get API keys from environment variables
-        // Vercel exposes these via process.env in Node, but in Edge Runtime we access them differently
-        // Actually in Vercel Edge Runtime, process.env IS supported for standard env vars
+        // 5. Get Keys
         const API_KEYS = [
             process.env.GEMINI_KEY_1,
             process.env.GEMINI_KEY_2,
@@ -43,22 +35,16 @@ export default async function handler(request) {
         ].filter(Boolean);
 
         if (API_KEYS.length === 0) {
-            return new Response(JSON.stringify({ error: 'No API keys configured' }), {
-                status: 500,
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            });
+            return res.status(500).json({ error: 'No API keys configured' });
         }
 
-        // Load balancing index
+        // 6. Load Balancing & Retry Logic
         const baseIndex = Math.floor(Date.now() / 60000 + Math.random() * API_KEYS.length) % API_KEYS.length;
         let lastError = null;
 
-        // Iterate through keys
         for (let i = 0; i < API_KEYS.length; i++) {
             const keyIndex = (baseIndex + i) % API_KEYS.length;
             const selectedKey = API_KEYS[keyIndex];
-
-            // Inner retry loop for each key
             const MAX_RETRIES_PER_KEY = 3;
 
             for (let retry = 0; retry < MAX_RETRIES_PER_KEY; retry++) {
@@ -73,21 +59,18 @@ export default async function handler(request) {
 
                     if (geminiResponse.ok) {
                         const result = await geminiResponse.json();
-                        return new Response(JSON.stringify(result), {
-                            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-                        });
+                        return res.status(200).json(result);
                     }
 
                     if (geminiResponse.status === 429) {
-                        // Rate limit - wait and retry same key
                         const waitTime = Math.pow(2, retry + 1) * 1000;
                         await new Promise(r => setTimeout(r, waitTime));
                         continue;
                     }
 
-                    // Other errors - break inner loop to try next key
                     lastError = { status: geminiResponse.status, message: await geminiResponse.text() };
                     break;
+
                 } catch (err) {
                     lastError = { message: err.message };
                     await new Promise(r => setTimeout(r, 1000));
@@ -95,18 +78,13 @@ export default async function handler(request) {
             }
         }
 
-        return new Response(JSON.stringify({
+        // All failed
+        return res.status(503).json({
             error: 'All API keys exhausted',
             lastError: lastError
-        }), {
-            status: 503,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
 
     } catch (error) {
-        return new Response(JSON.stringify({ error: error.message }), {
-            status: 500,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
+        return res.status(500).json({ error: error.message });
     }
 }
