@@ -42,7 +42,7 @@ GEMINI_API_KEY=your_api_key_here
 
 ## 在线演示
 
-访问: https://tianji-divination-ektf.vercel.app
+访问: https://tianji-divination-ektf.vercel.app (Live ✅)
 
 ## 许可证
 
