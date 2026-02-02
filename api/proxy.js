@@ -1,6 +1,4 @@
-export const config = {
-    runtime: 'edge', // Use Edge Runtime for better performance similar to Cloudflare Workers
-};
+// Node.js Runtime (Default)
 
 export default async function handler(request) {
     // CORS Headers
