@@ -71,7 +71,7 @@ const callGeminiViaProxy = async (prompt: string, model: string = HARDCODED_MODE
       const errorText = await response.text();
       // Check if it's the HTML 404/405 error from Vercel platform
       if (errorText.trim().startsWith('<')) {
-        throw new Error(`Proxy unreachable (Status ${response.status}). Please check Vercel deployment.`);
+        throw new Error(`Proxy unreachable (Status ${response.status}) at ${PROXY_URL}. The backend may be down or misconfigured (returning HTML instead of JSON).`);
       }
       console.error('Proxy error:', errorText);
       throw new Error(`Proxy returned ${response.status}: ${errorText}`);
