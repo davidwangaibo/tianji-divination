@@ -7,6 +7,35 @@ import { getHexagramInfo, getTransformedHexagram, hasMovingLines, toChineseNum }
 // ========================================
 const PROXY_URL = "/api/proxy";
 const HARDCODED_MODEL = "gemini-2.5-flash";
+const DIRECT_API_KEY =
+  (import.meta.env?.VITE_GEMINI_API_KEY as string | undefined) ??
+  ((import.meta.env as Record<string, string | undefined>)?.GEMINI_API_KEY as string | undefined) ??
+  (process.env as Record<string, string | undefined>)?.GEMINI_API_KEY;
+
+const extractGeminiText = (data: any): string => {
+  if (data?.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+    return data.candidates[0].content.parts[0].text;
+  }
+
+  throw new Error('Invalid response format from Gemini API');
+};
+
+const callGeminiDirect = async (prompt: string, model: string, apiKey: string): Promise<string> => {
+  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const response = await fetch(geminiUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Gemini returned ${response.status}: ${errorText}`);
+  }
+
+  const data = await response.json();
+  return extractGeminiText(data);
+};
 
 // 调用 Cloudflare Worker 代理
 const callGeminiViaProxy = async (prompt: string, model: string = HARDCODED_MODEL): Promise<string> => {
@@ -25,19 +54,23 @@ const callGeminiViaProxy = async (prompt: string, model: string = HARDCODED_MODE
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Proxy error:', errorText);
+
+      if ((response.status === 404 || response.status === 405) && DIRECT_API_KEY) {
+        return await callGeminiDirect(prompt, model, DIRECT_API_KEY);
+      }
+
       throw new Error(`Proxy returned ${response.status}: ${errorText}`);
     }
 
     const data = await response.json();
-
-    // 解析 Gemini API 响应格式
-    if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
-      return data.candidates[0].content.parts[0].text;
-    }
-
-    throw new Error('Invalid response format from Gemini API');
+    return extractGeminiText(data);
   } catch (error: any) {
     console.error('Failed to call Gemini via proxy:', error);
+
+    if (DIRECT_API_KEY) {
+      return await callGeminiDirect(prompt, model, DIRECT_API_KEY);
+    }
+
     throw error;
   }
 };

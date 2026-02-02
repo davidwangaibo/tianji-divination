@@ -34,11 +34,13 @@ npm run build
 
 ## 环境变量
 
-创建 `.env.local` 文件并添加：
+创建 `.env.local` 文件并添加（用于浏览器端直连 Gemini API，适用于 GitHub Pages 等纯静态部署）：
 
 ```
-GEMINI_API_KEY=your_api_key_here
+VITE_GEMINI_API_KEY=your_api_key_here
 ```
+
+如需使用服务器代理（例如部署到 Vercel），请配置后端环境变量 `GEMINI_KEY_1~7` 并保留 `/api/proxy` 端点。
 
 ## 在线演示
 
