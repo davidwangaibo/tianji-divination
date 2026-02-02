@@ -4,8 +4,10 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
+  const isGitHub = process.env.GITHUB_ACTIONS === 'true';
+
   return {
-    base: '/',
+    base: isGitHub ? '/tianji-divination-new/' : '/',
     server: {
       port: 3000,
       host: '0.0.0.0',

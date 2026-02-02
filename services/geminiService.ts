@@ -5,7 +5,7 @@ import { getHexagramInfo, getTransformedHexagram, hasMovingLines, toChineseNum }
 // Cloudflare Worker 代理配置
 // API Keys 现在完全隐藏在后端!
 // ========================================
-const PROXY_URL = "/api/proxy";
+const PROXY_URL = "https://tianji-divination-ektf.vercel.app/api/proxy";
 const HARDCODED_MODEL = "gemini-2.5-flash";
 
 // 调用 Cloudflare Worker 代理
