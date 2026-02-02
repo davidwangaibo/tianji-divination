@@ -5,11 +5,53 @@ import { getHexagramInfo, getTransformedHexagram, hasMovingLines, toChineseNum }
 // Cloudflare Worker 代理配置
 // API Keys 现在完全隐藏在后端!
 // ========================================
+// Vercel Proxy URL (Fallback if no key)
 const PROXY_URL = "https://tianji-divination-ektf.vercel.app/api/proxy";
 const HARDCODED_MODEL = "gemini-2.5-flash";
 
-// 调用 Cloudflare Worker 代理
+// Helper: Call Gemini Directly
+const callGeminiDirect = async (prompt: string, model: string, apiKey: string): Promise<string> => {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }]
+    })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Gemini API Error ${response.status}: ${errorText}`);
+  }
+
+  const data = await response.json();
+  if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+    return data.candidates[0].content.parts[0].text;
+  }
+  throw new Error('Invalid response format from Gemini API');
+};
+
+// Main Call Function
 const callGeminiViaProxy = async (prompt: string, model: string = HARDCODED_MODEL): Promise<string> => {
+  // 1. Try Direct Call if API Key is available (Preferred for GitHub Pages demo)
+  // Note: In a real production app, you should not expose keys on the client.
+  // But for this personal demo deployed via gh-pages, this is the most reliable method.
+  const apiKey = process.env.GEMINI_API_KEY || (import.meta as any).env?.VITE_GEMINI_API_KEY;
+
+  if (apiKey) {
+    try {
+      return await callGeminiDirect(prompt, model, apiKey);
+    } catch (error: any) {
+      console.warn("Direct API call failed, trying proxy...", error);
+      // Fallthrough to proxy
+    }
+  }
+
+  // 2. Fallback to Proxy
   try {
     const response = await fetch(PROXY_URL, {
       method: 'POST',
@@ -24,13 +66,16 @@ const callGeminiViaProxy = async (prompt: string, model: string = HARDCODED_MODE
 
     if (!response.ok) {
       const errorText = await response.text();
+      // Check if it's the HTML 404/405 error from Vercel platform
+      if (errorText.trim().startsWith('<')) {
+         throw new Error(`Proxy unreachable (Status ${response.status}). Please check Vercel deployment.`);
+      }
       console.error('Proxy error:', errorText);
       throw new Error(`Proxy returned ${response.status}: ${errorText}`);
     }
 
     const data = await response.json();
 
-    // 解析 Gemini API 响应格式
     if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
       return data.candidates[0].content.parts[0].text;
     }
